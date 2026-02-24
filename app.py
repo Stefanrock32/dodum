@@ -35,9 +35,6 @@ volume = modal.Volume.from_name("comfy-storage", create_if_missing=True)
 
 # ============ УТИЛИТА 1: Patch WanVideoWrapper ============
 def _patch_wanwrapper(nodes_py: Path) -> int:
-    """
-    Патчит баг в WanVideoWrapper/nodes.py: torch.zeros() с двойным H вместо H, W.
-    """
     if not nodes_py.exists():
         print(f"[WARN] nodes.py not found: {nodes_py}")
         return 0
@@ -69,9 +66,6 @@ def _patch_wanwrapper(nodes_py: Path) -> int:
 # ============ УТИЛИТА 2: Safe Download ============
 def safe_download(repo: str, filepath: str, out_dir: str, target_name: str, 
                   token: str, max_retries: int = 3) -> None:
-    """
-    Скачивает модель с HuggingFace с retry логикой.
-    """
     os.makedirs(out_dir, exist_ok=True)
     target_path = os.path.join(out_dir, target_name)
 
@@ -134,39 +128,27 @@ comfy_image = (
         "sageattention",
     )
     .run_commands(
-        # Create workspace directory first
-        "mkdir -p /workspace",
-        
-        # Clone ComfyUI
-        "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git",
-        
-        # ComfyUI requirements
-        "cd /workspace/ComfyUI && pip install -r requirements.txt",
-        
-        # Fix OpenCV conflict
-        "pip uninstall -y opencv-python opencv-contrib-python || true",
-        "pip install --no-cache-dir opencv-python-headless==4.10.0.84",
-        
-        # Clone custom nodes
-        "cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Manager.git",
-        "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git",
-        "git clone https://github.com/kijai/ComfyUI-KJNodes.git",
-        "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
-        "git clone https://github.com/kijai/ComfyUI-segment-anything-2.git",
-        "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
-        "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git",
-        "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git",
-        
-        # Install custom node requirements
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true",
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true",
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true",
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true",
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true",
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true",
-        
-        # CRITICAL: Impact-Pack install script
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py",
+        "mkdir -p /workspace && "
+        "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git && "
+        "cd /workspace/ComfyUI && pip install -r requirements.txt && "
+        "pip uninstall -y opencv-python opencv-contrib-python || true && "
+        "pip install --no-cache-dir opencv-python-headless==4.10.0.84 && "
+        "cd /workspace/ComfyUI/custom_nodes && "
+        "git clone https://github.com/ltdrdata/ComfyUI-Manager.git && "
+        "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && "
+        "git clone https://github.com/kijai/ComfyUI-KJNodes.git && "
+        "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git && "
+        "git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && "
+        "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git && "
+        "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
+        "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py"
     )
 )
 
@@ -181,47 +163,31 @@ comfy_image = (
     memory=8192
 )
 def download_models():
-    """Скачивает все необходимые модели."""
     volume.reload()
     token = os.environ.get('HF_TOKEN')
 
     DOWNLOADS = [
-        # CLIP Vision
         ('Comfy-Org/Wan_2.1_ComfyUI_repackaged',
          'split_files/clip_vision/clip_vision_h.safetensors',
          MODEL_DIRS['clip_vision'], 'clip_vision_h.safetensors'),
-
-        # VAE
         ('Comfy-Org/Wan_2.2_ComfyUI_Repackaged',
          'split_files/vae/wan_2.1_vae.safetensors',
          MODEL_DIRS['vae'], 'wan_2.1_vae.safetensors'),
-
-        # Text Encoder UMT5 fp16
         ('Comfy-Org/Wan_2.1_ComfyUI_repackaged',
          'split_files/text_encoders/umt5_xxl_fp16.safetensors',
          MODEL_DIRS['clip'], 'umt5_xxl_fp16.safetensors'),
-
-        # DiT Model Wan 2.2 I2V 14B fp8
         ('Comfy-Org/Wan_2.2_ComfyUI_Repackaged',
          'split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
          MODEL_DIRS['unet'], 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors'),
-
-        # YOLOv10m
         ('Wan-AI/Wan2.2-Animate-14B',
          'process_checkpoint/det/yolov10m.onnx',
          MODEL_DIRS['detection'], 'yolov10m.onnx'),
-
-        # ViTPose-L wholebody
         ('JunkyByte/easy_ViTPose',
          'onnx/wholebody/vitpose-l-wholebody.onnx',
          MODEL_DIRS['detection'], 'vitpose-l-wholebody.onnx'),
-
-        # face_yolov8m.pt
         ('Bingsu/adetailer',
          'face_yolov8m.pt',
          MODEL_DIRS['ultralytics_bbox'], 'face_yolov8m.pt'),
-
-        # SAM2 Large
         ('Kijai/sam2-safetensors',
          'sam2.1_hiera_large.safetensors',
          MODEL_DIRS['sams'], 'sam2.1_hiera_large.safetensors'),
@@ -246,9 +212,7 @@ def download_models():
 @modal.web_server(port=8188, startup_timeout=900)
 @modal.concurrent(max_inputs=100)
 def serve():
-    """Запускает ComfyUI сервер."""
     volume.reload()
-
     os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
 
     for d in list(MODEL_DIRS.values()) + [INPUT_DIR, OUTPUT_DIR, TORCH_CACHE]:
@@ -327,7 +291,6 @@ for name, path in {
 # ============ ENTRYPOINT ============
 @app.local_entrypoint()
 def main():
-    """Главная точка входа."""
     download_models.remote()
     print("Done! Run: modal deploy app.py")
 
