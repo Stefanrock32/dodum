@@ -1,0 +1,348 @@
+"""
+ComfyUI Wan2.2 Venom Video Generation - Modal.com Deployment
+"""
+import os
+import sys
+import shutil
+import time
+import subprocess
+import modal
+from pathlib import Path
+
+# ============ КОНСТАНТЫ ============
+MODELS_BASE = "/cache/models"
+INPUT_DIR = "/cache/input"
+OUTPUT_DIR = "/cache/output"
+TORCH_CACHE = "/cache/torch_compile"
+CUSTOM_NODES_DIR = "/workspace/ComfyUI/custom_nodes"
+
+MODEL_DIRS = {
+    "unet": f"{MODELS_BASE}/diffusion_models",
+    "clip": f"{MODELS_BASE}/clip",
+    "clip_vision": f"{MODELS_BASE}/clip_vision",
+    "vae": f"{MODELS_BASE}/vae",
+    "loras": f"{MODELS_BASE}/loras",
+    "detection": f"{MODELS_BASE}/detection",
+    "ultralytics_bbox": f"{MODELS_BASE}/ultralytics/bbox",
+    "sams": f"{MODELS_BASE}/sams",
+    "onnx": f"{MODELS_BASE}/onnx",
+}
+
+# ============ MODAL APP & VOLUME ============
+app = modal.App("comfyui-wan22-venom-master")
+volume = modal.Volume.from_name("comfy-storage", create_if_missing=True)
+
+
+# ============ УТИЛИТА 1: Patch WanVideoWrapper ============
+def _patch_wanwrapper(nodes_py: Path) -> int:
+    """
+    Патчит баг в WanVideoWrapper/nodes.py: torch.zeros() с двойным H вместо H, W.
+    """
+    if not nodes_py.exists():
+        print(f"[WARN] nodes.py not found: {nodes_py}")
+        return 0
+
+    content = nodes_py.read_text(encoding="utf-8")
+    original = content
+
+    # Ищем паттерны типа: torch.zeros(..., H, H, ...) и заменяем на H, W
+    # Regex: torch\.zeros\([^)]*?\bH\b,\s*\bH\b -> torch.zeros(...H, W
+    import re
+    # Паттерны: H, H или _h, _h -> H, W или _h, _w
+    patterns = [
+        (r'\bH\b,\s*\bH\b', 'H, W'),
+        (r'\bh\b,\s*\bh\b', 'h, w'),
+        (r'_h,\s*_h', '_h, _w'),
+        (r'_H,\s*_H', '_H, _W'),
+    ]
+
+    for pattern, replacement in patterns:
+        content = re.sub(pattern, replacement, content)
+
+    if content != original:
+        nodes_py.write_text(content, encoding="utf-8")
+        # Подсчитаем количество замен
+        count = sum(1 for p, r in patterns if p in original)
+        print(f"[PATCH] WanVideoWrapper: patched {count} occurrences")
+        return count
+    else:
+        print("[PATCH] WanVideoWrapper: no patch needed")
+        return 0
+
+
+# ============ УТИЛИТА 2: Safe Download ============
+def safe_download(repo: str, filepath: str, out_dir: str, target_name: str, 
+                  token: str, max_retries: int = 3) -> None:
+    """
+    Скачивает модель с HuggingFace с retry логикой.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    target_path = os.path.join(out_dir, target_name)
+
+    # Проверка кеша
+    if os.path.exists(target_path) and os.path.getsize(target_path) > 10 * 1024 * 1024:
+        print(f"[SKIP] {target_name} already cached")
+        return
+
+    from huggingface_hub import hf_hub_download
+
+    for attempt in range(max_retries):
+        try:
+            print(f"[DOWNLOAD] {target_name} (attempt {attempt + 1}/{max_retries})")
+            downloaded = hf_hub_download(
+                repo_id=repo,
+                filename=filepath,
+                local_dir=out_dir,
+                token=token,
+                resume_download=True
+            )
+            # Переименовать если нужно
+            if downloaded != target_path:
+                shutil.move(downloaded, target_path)
+            print(f"[DONE] {target_name}")
+            break
+        except Exception as e:
+            print(f"[ERROR] Attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                wait_time = 5 * (attempt + 1)
+                print(f"[RETRY] Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+            else:
+                print(f"[FAIL] Failed to download {target_name} after {max_retries} attempts")
+
+
+# ============ DOCKER IMAGE ============
+comfy_image = (
+    modal.Image.debian_slim(python_version='3.11')
+    .apt_install(
+        "git", "wget", "curl", "ffmpeg", "libgl1", "libglib2.0-0", 
+        "build-essential", "cmake", "python3-dev"
+    )
+    .pip_install(
+        "torch==2.4.1",
+        "torchvision==0.19.1",
+        "torchaudio==2.4.1",
+        index_url="https://download.pytorch.org/whl/cu121"
+    )
+    .pip_install(
+        "huggingface_hub",
+        "requests",
+        "tqdm",
+        "transformers",
+        "accelerate",
+        "sentencepiece",
+        "einops",
+        "onnxruntime-gpu",
+        "opencv-python-headless==4.10.0.84",
+        "ultralytics",
+        "diffusers>=0.29.0",
+        "pygit2",
+        "sageattention",
+    )
+    .run_commands(
+        # Clone ComfyUI
+        "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git",
+        
+        # ComfyUI requirements
+        "cd /workspace/ComfyUI && pip install -r requirements.txt",
+        
+        # Fix OpenCV conflict
+        "pip uninstall -y opencv-python opencv-contrib-python || true",
+        "pip install --no-cache-dir opencv-python-headless==4.10.0.84",
+        
+        # Clone custom nodes
+        "cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Manager.git",
+        "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git",
+        "git clone https://github.com/kijai/ComfyUI-KJNodes.git",
+        "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git",
+        "git clone https://github.com/kijai/ComfyUI-segment-anything-2.git",
+        "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git",
+        "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git",
+        "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git",
+        
+        # Install custom node requirements
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true",
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true",
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true",
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true",
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true",
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true",
+        
+        # CRITICAL: Impact-Pack install script
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py",
+    )
+)
+
+
+# ============ ФУНКЦИЯ: Download Models ============
+@app.function(
+    image=comfy_image,
+    volumes={'/cache': volume},
+    secrets=[modal.Secret.from_name('huggingface-secret')],
+    timeout=14400,
+    cpu=4.0,
+    memory=8192
+)
+def download_models():
+    """Скачивает все необходимые модели."""
+    volume.reload()
+    token = os.environ.get('HF_TOKEN')
+
+    DOWNLOADS = [
+        # CLIP Vision
+        ('Comfy-Org/Wan_2.1_ComfyUI_repackaged',
+         'split_files/clip_vision/clip_vision_h.safetensors',
+         MODEL_DIRS['clip_vision'], 'clip_vision_h.safetensors'),
+
+        # VAE
+        ('Comfy-Org/Wan_2.2_ComfyUI_Repackaged',
+         'split_files/vae/wan_2.1_vae.safetensors',
+         MODEL_DIRS['vae'], 'wan_2.1_vae.safetensors'),
+
+        # Text Encoder UMT5 fp16
+        ('Comfy-Org/Wan_2.1_ComfyUI_repackaged',
+         'split_files/text_encoders/umt5_xxl_fp16.safetensors',
+         MODEL_DIRS['clip'], 'umt5_xxl_fp16.safetensors'),
+
+        # DiT Model Wan 2.2 I2V 14B fp8
+        ('Comfy-Org/Wan_2.2_ComfyUI_Repackaged',
+         'split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
+         MODEL_DIRS['unet'], 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors'),
+
+        # YOLOv10m (детектор тела/лица)
+        ('Wan-AI/Wan2.2-Animate-14B',
+         'process_checkpoint/det/yolov10m.onnx',
+         MODEL_DIRS['detection'], 'yolov10m.onnx'),
+
+        # ViTPose-L wholebody
+        ('JunkyByte/easy_ViTPose',
+         'onnx/wholebody/vitpose-l-wholebody.onnx',
+         MODEL_DIRS['detection'], 'vitpose-l-wholebody.onnx'),
+
+        # face_yolov8m.pt (Impact-Pack UltralyticsDetector)
+        ('Bingsu/adetailer',
+         'face_yolov8m.pt',
+         MODEL_DIRS['ultralytics_bbox'], 'face_yolov8m.pt'),
+
+        # SAM2 Large
+        ('Kijai/sam2-safetensors',
+         'sam2.1_hiera_large.safetensors',
+         MODEL_DIRS['sams'], 'sam2.1_hiera_large.safetensors'),
+    ]
+
+    for repo, filepath, out_dir, name in DOWNLOADS:
+        safe_download(repo, filepath, out_dir, name, token)
+
+    volume.commit()
+    print("[DONE] All models downloaded!")
+
+
+# ============ ФУНКЦИЯ: Serve ComfyUI ============
+@app.function(
+    image=comfy_image,
+    gpu='A100-80GB',
+    timeout=86400,
+    volumes={'/cache': volume},
+    memory=65536,
+    max_containers=1
+)
+@modal.web_server(port=8188, startup_timeout=900)
+@modal.concurrent(max_inputs=100)
+def serve():
+    """Запускает ComfyUI сервер."""
+    volume.reload()
+
+    # Set torch compile cache
+    os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
+
+    # Create directories
+    for d in list(MODEL_DIRS.values()) + [INPUT_DIR, OUTPUT_DIR, TORCH_CACHE]:
+        os.makedirs(d, exist_ok=True)
+
+    # Patch WanVideoWrapper
+    nodes_py = Path(f'{CUSTOM_NODES_DIR}/ComfyUI-WanVideoWrapper/nodes.py')
+    _patch_wanwrapper(nodes_py)
+
+    # Create symlinks for detection/sams/ultralytics/onnx
+    comfy_models = "/workspace/ComfyUI/models"
+    symlink_map = {
+        "detection": MODEL_DIRS['detection'],
+        "ultralytics": MODEL_DIRS['ultralytics_bbox'],
+        "sams": MODEL_DIRS['sams'],
+        "onnx": MODEL_DIRS['onnx'],
+    }
+
+    for name, target in symlink_map.items():
+        link_path = os.path.join(comfy_models, name)
+        if os.path.islink(link_path):
+            os.unlink(link_path)
+        elif os.path.exists(link_path):
+            shutil.rmtree(link_path)
+        os.symlink(target, link_path)
+        print(f"[SYMLINK] {link_path} -> {target}")
+
+    # Write zzz_paths_fix.py
+    zzz_paths_fix = '''"""
+Path fix for detection/sams/ultralytics/onnx models.
+"""
+from folder_paths import folder_paths
+
+NODE_CLASS_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS = {}
+
+# Register custom model paths
+for name, path in {
+    "detection": "/cache/models/detection",
+    "sams": "/cache/models/sams",
+    "ultralytics": "/cache/models/ultralytics/bbox",
+    "onnx": "/cache/models/onnx",
+}.items():
+    if name not in folder_paths.folder_names:
+        folder_paths.folder_names[name] = []
+    if path not in folder_paths.folder_names[name]:
+        folder_paths.folder_names[name].append(path)
+'''
+    zzz_path = os.path.join(CUSTOM_NODES_DIR, 'zzz_paths_fix.py')
+    Path(zzz_path).write_text(zzz_paths_fix, encoding="utf-8")
+    print(f"[WRITE] {zzz_path}")
+
+    # Write extra_model_paths.yaml
+    extra_paths_yaml = '''modal_storage:
+  base_path: /cache/models
+  unet: diffusion_models
+  clip: clip
+  vae: vae
+  loras: loras
+  clip_vision: clip_vision
+  controlnet: controlnet
+  upscalers: upscalers
+  embeddings: embeddings
+  vae_approx: vae_approx
+'''
+    yaml_path = "/workspace/ComfyUI/extra_model_paths.yaml"
+    Path(yaml_path).write_text(extra_paths_yaml, encoding="utf-8")
+    print(f"[WRITE] {yaml_path}")
+
+    # Change to ComfyUI directory
+    os.chdir('/workspace/ComfyUI')
+
+    # Start ComfyUI
+    return subprocess.Popen([
+        sys.executable, 'main.py',
+        '--listen', '0.0.0.0',
+        '--port', '8188',
+        '--input-directory', INPUT_DIR,
+        '--output-directory', OUTPUT_DIR
+    ])
+
+
+# ============ ENTRYPOINT ============
+@app.local_entrypoint()
+def main():
+    """Главная точка входа."""
+    download_models.remote()
+    print("Done! Run: modal deploy app.py")
+
+
+if __name__ == "__main__":
+    pass
