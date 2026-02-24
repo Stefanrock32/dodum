@@ -45,10 +45,7 @@ def _patch_wanwrapper(nodes_py: Path) -> int:
     content = nodes_py.read_text(encoding="utf-8")
     original = content
 
-    # Ищем паттерны типа: torch.zeros(..., H, H, ...) и заменяем на H, W
-    # Regex: torch\.zeros\([^)]*?\bH\b,\s*\bH\b -> torch.zeros(...H, W
     import re
-    # Паттерны: H, H или _h, _h -> H, W или _h, _w
     patterns = [
         (r'\bH\b,\s*\bH\b', 'H, W'),
         (r'\bh\b,\s*\bh\b', 'h, w'),
@@ -61,7 +58,6 @@ def _patch_wanwrapper(nodes_py: Path) -> int:
 
     if content != original:
         nodes_py.write_text(content, encoding="utf-8")
-        # Подсчитаем количество замен
         count = sum(1 for p, r in patterns if p in original)
         print(f"[PATCH] WanVideoWrapper: patched {count} occurrences")
         return count
@@ -79,7 +75,6 @@ def safe_download(repo: str, filepath: str, out_dir: str, target_name: str,
     os.makedirs(out_dir, exist_ok=True)
     target_path = os.path.join(out_dir, target_name)
 
-    # Проверка кеша
     if os.path.exists(target_path) and os.path.getsize(target_path) > 10 * 1024 * 1024:
         print(f"[SKIP] {target_name} already cached")
         return
@@ -96,7 +91,6 @@ def safe_download(repo: str, filepath: str, out_dir: str, target_name: str,
                 token=token,
                 resume_download=True
             )
-            # Переименовать если нужно
             if downloaded != target_path:
                 shutil.move(downloaded, target_path)
             print(f"[DONE] {target_name}")
@@ -140,6 +134,9 @@ comfy_image = (
         "sageattention",
     )
     .run_commands(
+        # Create workspace directory first
+        "mkdir -p /workspace",
+        
         # Clone ComfyUI
         "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git",
         
@@ -209,7 +206,7 @@ def download_models():
          'split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
          MODEL_DIRS['unet'], 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors'),
 
-        # YOLOv10m (детектор тела/лица)
+        # YOLOv10m
         ('Wan-AI/Wan2.2-Animate-14B',
          'process_checkpoint/det/yolov10m.onnx',
          MODEL_DIRS['detection'], 'yolov10m.onnx'),
@@ -219,7 +216,7 @@ def download_models():
          'onnx/wholebody/vitpose-l-wholebody.onnx',
          MODEL_DIRS['detection'], 'vitpose-l-wholebody.onnx'),
 
-        # face_yolov8m.pt (Impact-Pack UltralyticsDetector)
+        # face_yolov8m.pt
         ('Bingsu/adetailer',
          'face_yolov8m.pt',
          MODEL_DIRS['ultralytics_bbox'], 'face_yolov8m.pt'),
@@ -252,18 +249,14 @@ def serve():
     """Запускает ComfyUI сервер."""
     volume.reload()
 
-    # Set torch compile cache
     os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
 
-    # Create directories
     for d in list(MODEL_DIRS.values()) + [INPUT_DIR, OUTPUT_DIR, TORCH_CACHE]:
         os.makedirs(d, exist_ok=True)
 
-    # Patch WanVideoWrapper
     nodes_py = Path(f'{CUSTOM_NODES_DIR}/ComfyUI-WanVideoWrapper/nodes.py')
     _patch_wanwrapper(nodes_py)
 
-    # Create symlinks for detection/sams/ultralytics/onnx
     comfy_models = "/workspace/ComfyUI/models"
     symlink_map = {
         "detection": MODEL_DIRS['detection'],
@@ -281,7 +274,6 @@ def serve():
         os.symlink(target, link_path)
         print(f"[SYMLINK] {link_path} -> {target}")
 
-    # Write zzz_paths_fix.py
     zzz_paths_fix = '''"""
 Path fix for detection/sams/ultralytics/onnx models.
 """
@@ -290,7 +282,6 @@ from folder_paths import folder_paths
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}
 
-# Register custom model paths
 for name, path in {
     "detection": "/cache/models/detection",
     "sams": "/cache/models/sams",
@@ -306,7 +297,6 @@ for name, path in {
     Path(zzz_path).write_text(zzz_paths_fix, encoding="utf-8")
     print(f"[WRITE] {zzz_path}")
 
-    # Write extra_model_paths.yaml
     extra_paths_yaml = '''modal_storage:
   base_path: /cache/models
   unet: diffusion_models
@@ -323,10 +313,8 @@ for name, path in {
     Path(yaml_path).write_text(extra_paths_yaml, encoding="utf-8")
     print(f"[WRITE] {yaml_path}")
 
-    # Change to ComfyUI directory
     os.chdir('/workspace/ComfyUI')
 
-    # Start ComfyUI
     return subprocess.Popen([
         sys.executable, 'main.py',
         '--listen', '0.0.0.0',
