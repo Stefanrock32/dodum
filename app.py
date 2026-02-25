@@ -110,7 +110,7 @@ comfy_image = (
         "torch==2.4.1",
         "torchvision==0.19.1",
         "torchaudio==2.4.1",
-        index_url="https://download.pytorch.org/whl/cu121"
+        index_url="https://download.pytorch.org/whl/cu124"
     )
     .pip_install(
         "huggingface_hub",
@@ -125,7 +125,8 @@ comfy_image = (
         "ultralytics",
         "diffusers>=0.29.0",
         "pygit2",
-        "sageattention",
+        "pyyaml",
+        "numpy",
     )
     .run_commands(
         "mkdir -p /workspace && "
@@ -206,11 +207,9 @@ def download_models():
     gpu='A100-80GB',
     timeout=86400,
     volumes={'/cache': volume},
-    memory=65536,
-    max_containers=1
+    memory=65536
 )
 @modal.web_server(port=8188, startup_timeout=900)
-@modal.concurrent(max_inputs=100)
 def serve():
     volume.reload()
     os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
@@ -234,7 +233,10 @@ def serve():
         if os.path.islink(link_path):
             os.unlink(link_path)
         elif os.path.exists(link_path):
-            shutil.rmtree(link_path)
+            if os.path.isdir(link_path):
+                shutil.rmtree(link_path)
+            else:
+                os.remove(link_path)
         os.symlink(target, link_path)
         print(f"[SYMLINK] {link_path} -> {target}")
 
@@ -261,17 +263,16 @@ for name, path in {
     Path(zzz_path).write_text(zzz_paths_fix, encoding="utf-8")
     print(f"[WRITE] {zzz_path}")
 
-    extra_paths_yaml = '''modal_storage:
-  base_path: /cache/models
-  unet: diffusion_models
-  clip: clip
-  vae: vae
-  loras: loras
-  clip_vision: clip_vision
-  controlnet: controlnet
-  upscalers: upscalers
-  embeddings: embeddings
-  vae_approx: vae_approx
+    extra_paths_yaml = '''MODAL_STORAGE:
+  base_path: "/cache/models"
+  models_unet: "diffusion_models"
+  models_clip: "clip"
+  models_vae: "vae"
+  models_lora: "loras"
+  models_clip_vision: "clip_vision"
+  models_controlnet: "controlnet"
+  models_upscalers: "upscalers"
+  models_embeddings: "embeddings"
 '''
     yaml_path = "/workspace/ComfyUI/extra_model_paths.yaml"
     Path(yaml_path).write_text(extra_paths_yaml, encoding="utf-8")
@@ -279,7 +280,8 @@ for name, path in {
 
     os.chdir('/workspace/ComfyUI')
 
-    return subprocess.Popen([
+    # Run server directly - don't return subprocess
+    subprocess.call([
         sys.executable, 'main.py',
         '--listen', '0.0.0.0',
         '--port', '8188',

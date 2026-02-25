@@ -1,6 +1,6 @@
 {
   "last_node_id": 35,
-  "last_link_id": 42,
+  "last_link_id": 43,
   "nodes": [
     {
       "id": 1,
@@ -228,7 +228,7 @@
       "order": 12,
       "mode": 0,
       "inputs": [
-        {"name": "model", "type": "WANVIDEOMODEL", "link": 12, "slot_index": 0},
+        {"name": "model", "type": "WANVIDEOMODEL", "link": 38, "slot_index": 0},
         {"name": "image_embeds", "type": "WANVIDIMAGE_EMBEDS", "link": 13, "slot_index": 1},
         {"name": "text_embeds", "type": "WANVIDEOTEXTEMBEDS", "link": 14, "slot_index": 2},
         {"name": "samples", "type": "LATENT", "link": 15, "slot_index": 3},
@@ -510,7 +510,6 @@
     [9, 6, 0, 7, 0, "MASK"],
     [10, 1, 0, 13, 0, "IMAGE"],
     [11, 9, 0, 13, 1, "WANVAE"],
-    [12, 8, 0, 15, 0, "WANVIDEOMODEL"],
     [13, 29, 0, 15, 1, "WANVIDIMAGE_EMBEDS"],
     [14, 10, 0, 15, 2, "WANVIDEOTEXTEMBEDS"],
     [15, 30, 0, 15, 3, "LATENT"],
@@ -535,7 +534,8 @@
     [34, 16, 0, 32, 1, "IMAGE"],
     [35, 7, 0, 32, 2, "MASK"],
     [36, 8, 0, 35, 0, "WANVIDEOMODEL"],
-    [37, 33, 0, 35, 1, "BLOCKSWAPARGS"]
+    [37, 33, 0, 35, 1, "BLOCKSWAPARGS"],
+    [38, 35, 0, 15, 0, "WANVIDEOMODEL"]
   ],
   "groups": [],
   "config": {},
