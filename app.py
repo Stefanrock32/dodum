@@ -245,7 +245,7 @@ def serve():
     zzz_paths_fix = '''"""
 Path fix for detection/sams/ultralytics/onnx models.
 """
-from folder_paths import folder_paths
+import folder_paths
 
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}
