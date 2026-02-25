@@ -135,6 +135,7 @@ comfy_image = (
         "cd /workspace/ComfyUI && pip install -r requirements.txt && "
         "pip uninstall -y opencv-python opencv-contrib-python || true && "
         "pip install --no-cache-dir opencv-python-headless==4.10.0.84 && "
+        "pip install --no-cache-dir scikit-image && "
         "cd /workspace/ComfyUI/custom_nodes && "
         "git clone https://github.com/ltdrdata/ComfyUI-Manager.git && "
         "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && "
@@ -144,13 +145,7 @@ comfy_image = (
         "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git && "
         "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
         "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py"
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && pip install -r requirements.txt || true"
     )
 )
 
@@ -242,29 +237,7 @@ def serve():
         os.symlink(target, link_path)
         print(f"[SYMLINK] {link_path} -> {target}")
 
-    zzz_paths_fix = '''"""
-Path fix for detection/sams/ultralytics/onnx models.
-"""
-import folder_paths
-
-NODE_CLASS_MAPPINGS = {}
-NODE_DISPLAY_NAME_MAPPINGS = {}
-
-for name, path in {
-    "detection": "/cache/models/detection",
-    "sams": "/cache/models/sams",
-    "ultralytics": "/cache/models/ultralytics/bbox",
-    "onnx": "/cache/models/onnx",
-}.items():
-    if name not in folder_paths.folder_names:
-        folder_paths.folder_names[name] = []
-    if path not in folder_paths.folder_names[name]:
-        folder_paths.folder_names[name].append(path)
-'''
-    zzz_path = os.path.join(CUSTOM_NODES_DIR, 'zzz_paths_fix.py')
-    Path(zzz_path).write_text(zzz_paths_fix, encoding="utf-8")
-    print(f"[WRITE] {zzz_path}")
-
+    # Extra model paths via YAML only (no custom node needed)
     extra_paths_yaml = '''MODAL_STORAGE:
   base_path: "/cache/models"
   models_unet: "diffusion_models"
@@ -282,7 +255,7 @@ for name, path in {
 
     os.chdir('/workspace/ComfyUI')
 
-    # Run server directly - don't return subprocess
+    # Run server directly
     subprocess.call([
         sys.executable, 'main.py',
         '--listen', '0.0.0.0',
