@@ -1,6 +1,6 @@
 {
-  "last_node_id": 35,
-  "last_link_id": 55,
+  "last_node_id": 40,
+  "last_link_id": 60,
   "nodes": [
     {
       "id": 1,
@@ -104,7 +104,46 @@
         {"name": "mask_inverted", "type": "MASK", "slot_index": 1}
       ],
       "properties": {"cnr_id": "comfyui-kjnodes", "Node name for S&R": "GrowMaskWithBlur"},
-      "widgets_values": [25, 0.0, true, 10, 1.0, 1.0, false]
+      "widgets_values": [30, 0.0, true, 12, 1.0, 1.0, false]
+    },
+    {
+      "id": 40,
+      "type": "MaskToImage",
+      "pos": [2300, 100],
+      "size": [315, 262],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [{"name": "mask", "type": "MASK", "link": 40, "slot_index": 0}],
+      "outputs": [{"name": "IMAGE", "type": "IMAGE", "slot_index": 0}],
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "MaskToImage"},
+      "widgets_values": []
+    },
+    {
+      "id": 41,
+      "type": "ImageCrop",
+      "pos": [2750, 100],
+      "size": [315, 262],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [{"name": "image", "type": "IMAGE", "link": 41, "slot_index": 0}],
+      "outputs": [{"name": "IMAGE", "type": "IMAGE", "slot_index": 0}],
+      "properties": {"cnr_id": "comfyui-kjnodes", "Node name for S&R": "ImageCrop"},
+      "widgets_values": [0.5, 0.0, 1.0, 1.0]
+    },
+    {
+      "id": 42,
+      "type": "ImageToMask",
+      "pos": [3200, 100],
+      "size": [315, 106],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [{"name": "image", "type": "IMAGE", "link": 42, "slot_index": 0}],
+      "outputs": [{"name": "MASK", "type": "MASK", "slot_index": 0}],
+      "properties": {"cnr_id": "comfyui-kjnodes", "Node name for S&R": "ImageToMask"},
+      "widgets_values": ["channel_red"]
     },
     {
       "id": 8,
@@ -112,7 +151,7 @@
       "pos": [50, 700],
       "size": [400, 200],
       "flags": {},
-      "order": 6,
+      "order": 9,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "WANVIDEOMODEL", "type": "WANVIDEOMODEL", "slot_index": 0}],
@@ -125,7 +164,7 @@
       "pos": [500, 700],
       "size": [400, 100],
       "flags": {},
-      "order": 7,
+      "order": 10,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "WANVAE", "type": "WANVAE", "slot_index": 0}],
@@ -138,7 +177,7 @@
       "pos": [500, 900],
       "size": [400, 200],
       "flags": {},
-      "order": 8,
+      "order": 11,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "WANVIDEOTEXTEMBEDS", "type": "WANVIDEOTEXTEMBEDS", "slot_index": 0}],
@@ -151,7 +190,7 @@
       "pos": [950, 700],
       "size": [400, 200],
       "flags": {},
-      "order": 9,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {"name": "image", "type": "IMAGE", "link": 10, "slot_index": 0},
@@ -167,7 +206,7 @@
       "pos": [1400, 700],
       "size": [400, 200],
       "flags": {},
-      "order": 10,
+      "order": 13,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "WANVIDCONTEXT", "type": "WANVIDCONTEXT", "slot_index": 0}],
@@ -180,7 +219,7 @@
       "pos": [1850, 700],
       "size": [400, 262],
       "flags": {},
-      "order": 11,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "WANVIDEOMODEL", "link": 38, "slot_index": 0},
@@ -202,7 +241,7 @@
       "pos": [2300, 700],
       "size": [400, 200],
       "flags": {},
-      "order": 12,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {"name": "vae", "type": "WANVAE", "link": 17, "slot_index": 0},
@@ -218,7 +257,7 @@
       "pos": [3200, 700],
       "size": [400, 270],
       "flags": {},
-      "order": 13,
+      "order": 16,
       "mode": 0,
       "inputs": [{"name": "images", "type": "IMAGE", "link": 19, "slot_index": 0}],
       "outputs": [
@@ -231,12 +270,12 @@
     {
       "id": 18,
       "type": "MaskToImage",
-      "pos": [2300, 100],
+      "pos": [2300, 400],
       "size": [315, 262],
       "flags": {},
-      "order": 14,
+      "order": 17,
       "mode": 0,
-      "inputs": [{"name": "mask", "type": "MASK", "link": 20, "slot_index": 0}],
+      "inputs": [{"name": "mask", "type": "MASK", "link": 50, "slot_index": 0}],
       "outputs": [{"name": "IMAGE", "type": "IMAGE", "slot_index": 0}],
       "properties": {"cnr_id": "comfy-core", "Node name for S&R": "MaskToImage"},
       "widgets_values": []
@@ -244,12 +283,12 @@
     {
       "id": 19,
       "type": "VHS_VideoCombine",
-      "pos": [2750, 100],
+      "pos": [2750, 400],
       "size": [400, 270],
       "flags": {},
-      "order": 15,
+      "order": 18,
       "mode": 0,
-      "inputs": [{"name": "images", "type": "IMAGE", "link": 21, "slot_index": 0}],
+      "inputs": [{"name": "images", "type": "IMAGE", "link": 51, "slot_index": 0}],
       "outputs": [
         {"name": "GIF", "type": "GIF", "slot_index": 0},
         {"name": "VIDEO", "type": "VIDEO", "slot_index": 1}
@@ -263,7 +302,7 @@
       "pos": [50, 500],
       "size": [400, 100],
       "flags": {},
-      "order": 16,
+      "order": 19,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "CLIP_VISION", "type": "CLIP_VISION", "slot_index": 0}],
@@ -276,7 +315,7 @@
       "pos": [500, 500],
       "size": [400, 200],
       "flags": {},
-      "order": 17,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {"name": "clip_vision", "type": "CLIP_VISION", "link": 26, "slot_index": 0},
@@ -292,7 +331,7 @@
       "pos": [950, 500],
       "size": [400, 200],
       "flags": {},
-      "order": 18,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {"name": "vae", "type": "WANVAE", "link": 28, "slot_index": 0},
@@ -309,11 +348,11 @@
       "pos": [1400, 500],
       "size": [315, 262],
       "flags": {},
-      "order": 19,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {"name": "samples", "type": "LATENT", "link": 31, "slot_index": 0},
-        {"name": "mask", "type": "MASK", "link": 50, "slot_index": 1}
+        {"name": "mask", "type": "MASK", "link": 60, "slot_index": 1}
       ],
       "outputs": [{"name": "LATENT", "type": "LATENT", "slot_index": 0}],
       "properties": {"cnr_id": "comfy-core", "Node name for S&R": "SetLatentNoiseMask"},
@@ -325,12 +364,12 @@
       "pos": [2750, 700],
       "size": [315, 262],
       "flags": {},
-      "order": 20,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {"name": "destination", "type": "IMAGE", "link": 33, "slot_index": 0},
         {"name": "source", "type": "IMAGE", "link": 34, "slot_index": 1},
-        {"name": "mask", "type": "MASK", "link": 51, "slot_index": 2}
+        {"name": "mask", "type": "MASK", "link": 61, "slot_index": 2}
       ],
       "outputs": [{"name": "IMAGE", "type": "IMAGE", "slot_index": 0}],
       "properties": {"cnr_id": "comfy-core", "Node name for S&R": "ImageCompositeMasked"},
@@ -342,7 +381,7 @@
       "pos": [50, 1100],
       "size": [400, 200],
       "flags": {},
-      "order": 21,
+      "order": 24,
       "mode": 0,
       "inputs": [],
       "outputs": [{"name": "BLOCKSWAPARGS", "type": "BLOCKSWAPARGS", "slot_index": 0}],
@@ -355,7 +394,7 @@
       "pos": [500, 1100],
       "size": [400, 200],
       "flags": {},
-      "order": 22,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "WANVIDEOMODEL", "link": 36, "slot_index": 0},
@@ -373,6 +412,9 @@
     [4, 4, 0, 6, 0, "BBOX"],
     [5, 1, 0, 6, 1, "IMAGE"],
     [6, 7, 0, 7, 0, "MASK"],
+    [40, 7, 0, 40, 0, "MASK"],
+    [41, 40, 0, 41, 0, "IMAGE"],
+    [42, 41, 0, 42, 0, "IMAGE"],
     [10, 1, 0, 13, 0, "IMAGE"],
     [11, 9, 0, 13, 1, "WANVAE"],
     [13, 29, 0, 15, 1, "WANVIDIMAGE_EMBEDS"],
@@ -382,8 +424,6 @@
     [17, 9, 0, 16, 0, "WANVAE"],
     [18, 15, 0, 16, 1, "LATENT"],
     [19, 32, 0, 17, 0, "IMAGE"],
-    [20, 7, 0, 18, 0, "MASK"],
-    [21, 18, 0, 19, 0, "IMAGE"],
     [26, 27, 0, 28, 0, "CLIP_VISION"],
     [27, 1, 0, 28, 1, "IMAGE"],
     [28, 9, 0, 29, 0, "WANVAE"],
@@ -395,8 +435,10 @@
     [36, 8, 0, 35, 0, "WANVIDEOMODEL"],
     [37, 33, 0, 35, 1, "BLOCKSWAPARGS"],
     [38, 35, 0, 15, 0, "WANVIDEOMODEL"],
-    [50, 7, 0, 30, 1, "MASK"],
-    [51, 7, 0, 32, 2, "MASK"]
+    [50, 7, 0, 18, 0, "MASK"],
+    [51, 18, 0, 19, 0, "IMAGE"],
+    [60, 42, 0, 30, 1, "MASK"],
+    [61, 42, 0, 32, 2, "MASK"]
   ],
   "groups": [],
   "config": {},

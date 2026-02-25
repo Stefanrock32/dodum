@@ -119,7 +119,6 @@ comfy_image = (
         "mkdir -p /workspace && "
         "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git && "
         "cd /workspace/ComfyUI && pip install -r requirements.txt && "
-        # First uninstall ALL opencv, THEN install headless
         "pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true && "
         "pip install --no-cache-dir opencv-python-headless==4.10.0.84 && "
         "cd /workspace/ComfyUI/custom_nodes && "
@@ -127,15 +126,11 @@ comfy_image = (
         "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && "
         "git clone https://github.com/kijai/ComfyUI-KJNodes.git && "
         "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git && "
-        "git clone https://github.com/kijai/ComfyUI-segment-anything-2.git && "
-        "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git && "
         "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
         "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py"
     )
@@ -166,18 +161,9 @@ def download_models():
         ('Comfy-Org/Wan_2.2_ComfyUI_Repackaged',
          'split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
          MODEL_DIRS['unet'], 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors'),
-        ('Wan-AI/Wan2.2-Animate-14B',
-         'process_checkpoint/det/yolov10m.onnx',
-         MODEL_DIRS['detection'], 'yolov10m.onnx'),
-        ('JunkyByte/easy_ViTPose',
-         'onnx/wholebody/vitpose-l-wholebody.onnx',
-         MODEL_DIRS['detection'], 'vitpose-l-wholebody.onnx'),
         ('Bingsu/adetailer',
          'face_yolov8m.pt',
          MODEL_DIRS['ultralytics_bbox'], 'face_yolov8m.pt'),
-        ('Kijai/sam2-safetensors',
-         'sam2.1_hiera_large.safetensors',
-         MODEL_DIRS['sams'], 'sam2.1_hiera_large.safetensors'),
     ]
     for repo, filepath, out_dir, name in DOWNLOADS:
         safe_download(repo, filepath, out_dir, name, token)
