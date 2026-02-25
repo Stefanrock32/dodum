@@ -1,5 +1,8 @@
 """
 ComfyUI Wan2.2 Venom Video Generation - Modal.com Deployment
+
+This project deploys ComfyUI with Wan2.2 Venom video generation capabilities on Modal.com.
+It provides a cloud-based GPU-accelerated environment for running AI video generation workflows.
 """
 import os
 import sys
@@ -210,6 +213,7 @@ def download_models():
     print("[DONE] All models downloaded!")
 
 
+# NOTE: max_containers=1 - This function MUST run with only 1 container (required for ComfyUI web server statefulness)
 @app.function(
     image=comfy_image,
     gpu='A100-80GB',
