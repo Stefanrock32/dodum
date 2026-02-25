@@ -207,7 +207,8 @@ def download_models():
     gpu='A100-80GB',
     timeout=86400,
     volumes={'/cache': volume},
-    memory=65536
+    memory=65536,
+    max_containers=1
 )
 @modal.web_server(port=8188, startup_timeout=900)
 def serve():
