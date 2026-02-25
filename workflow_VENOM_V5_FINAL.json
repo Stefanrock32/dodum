@@ -1,6 +1,6 @@
 {
   "last_node_id": 22,
-  "last_link_id": 30,
+  "last_link_id": 31,
   "nodes": [
     {
       "id": 1,
@@ -20,18 +20,18 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["INT", "width", [8]],
-        ["INT", "height", [9]],
+        ["INT", "width", []],
+        ["INT", "height", []],
         ["INT", "count", []]
       ]
     },
     {
       "id": 3,
       "type": "UltralyticsDetectorProvider",
-      "widgets_values": ["bbox/face_yolov8m.pt"],
+      "widgets_values": ["face_yolov8m.pt"],
       "inputs": [],
       "outputs": [
-        ["BBOX_DETECTOR", "bbox_detector", [12]]
+        ["BBOX_DETECTOR", "bbox_detector", []]
       ]
     },
     {
@@ -43,19 +43,19 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", [13]]
+        ["MASK", "mask", []]
       ]
     },
     {
       "id": 5,
-      "type": "MaskRect",
+      "type": "MaskRectArea",
       "widgets_values": [50, 0, 50, 100, 0],
       "inputs": [
         ["INT", "width", [["2", 0]]],
         ["INT", "height", [["2", 1]]]
       ],
       "outputs": [
-        ["MASK", "mask", [14]]
+        ["MASK", "mask", []]
       ]
     },
     {
@@ -67,7 +67,7 @@
         ["MASK", "mask_b", [["5", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", [15]]
+        ["MASK", "mask", []]
       ]
     },
     {
@@ -78,7 +78,7 @@
         ["MASK", "mask", [["6", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", [16]]
+        ["MASK", "mask", []]
       ]
     },
     {
@@ -87,7 +87,7 @@
       "widgets_values": ["wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors", "fp16_fast", "fp8_e4m3fn", "main_device", "sageattn", "default"],
       "inputs": [],
       "outputs": [
-        ["WANVIDEOMODEL", "model", [17]]
+        ["WANVIDEOMODEL", "model", []]
       ]
     },
     {
@@ -96,7 +96,7 @@
       "widgets_values": ["wan_2.1_vae.safetensors", "bf16"],
       "inputs": [],
       "outputs": [
-        ["WANVAE", "vae", [18, 19, 20]]
+        ["WANVAE", "vae", []]
       ]
     },
     {
@@ -105,7 +105,7 @@
       "widgets_values": ["umt5_xxl_fp16.safetensors", "bf16", "Venom", "", "disabled", false, "gpu"],
       "inputs": [],
       "outputs": [
-        ["WANVIDEOTEXTEMBEDS", "text_embeds", [21]]
+        ["WANVIDEOTEXTEMBEDS", "text_embeds", []]
       ]
     },
     {
@@ -114,7 +114,7 @@
       "widgets_values": ["clip_vision_h.safetensors"],
       "inputs": [],
       "outputs": [
-        ["CLIP_VISION", "clip_vision", [22]]
+        ["CLIP_VISION", "clip_vision", []]
       ]
     },
     {
@@ -126,7 +126,7 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", [23]]
+        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", []]
       ]
     },
     {
@@ -139,7 +139,7 @@
         ["IMAGE", "start_image", [["1", 0]]]
       ],
       "outputs": [
-        ["WANVIDIMAGE_EMBEDS", "image_embeds", [24]]
+        ["WANVIDIMAGE_EMBEDS", "image_embeds", []]
       ]
     },
     {
@@ -148,7 +148,7 @@
       "widgets_values": ["static_standard", 81, 4, 32, true, false, "linear"],
       "inputs": [],
       "outputs": [
-        ["WANVIDCONTEXT", "context_opts", [25]]
+        ["WANVIDCONTEXT", "context_opts", []]
       ]
     },
     {
@@ -160,7 +160,7 @@
         ["WANVAE", "vae", [["11", 0]]]
       ],
       "outputs": [
-        ["LATENT", "latent", [26]]
+        ["LATENT", "latent", []]
       ]
     },
     {
@@ -175,7 +175,7 @@
         ["LATENT", "samples", [["17", 0]]]
       ],
       "outputs": [
-        ["LATENT", "latent", [27]]
+        ["LATENT", "latent", []]
       ]
     },
     {
@@ -187,7 +187,7 @@
         ["LATENT", "samples", [["18", 0]]]
       ],
       "outputs": [
-        ["IMAGE", "image", [28]]
+        ["IMAGE", "image", []]
       ]
     },
     {
@@ -200,7 +200,7 @@
         ["MASK", "mask", [["7", 0]]]
       ],
       "outputs": [
-        ["IMAGE", "image", [29]]
+        ["IMAGE", "image", []]
       ]
     },
     {
@@ -212,7 +212,7 @@
         ["AUDIO", "audio", [["1", 1]]]
       ],
       "outputs": [
-        ["IMAGE", "image", [30]]
+        ["IMAGE", "image", []]
       ]
     },
     {
@@ -240,34 +240,35 @@
     }
   ],
   "links": [
-    [8, 2, 0, 5, 0, "INT"],
-    [9, 2, 1, 5, 1, "INT"],
-    [12, 3, 0, 4, 0, "BBOX_DETECTOR"],
-    [13, 4, 0, 6, 0, "MASK"],
-    [14, 5, 0, 6, 1, "MASK"],
-    [15, 6, 0, 7, 0, "MASK"],
-    [16, 7, 0, 20, 2, "MASK"],
-    [17, 10, 0, 18, 0, "WANVIDEOMODEL"],
-    [18, 11, 0, 15, 0, "WANVAE"],
-    [19, 11, 0, 17, 1, "WANVAE"],
-    [20, 11, 0, 19, 0, "WANVAE"],
-    [21, 12, 0, 18, 2, "WANVIDEOTEXTEMBEDS"],
-    [22, 13, 0, 14, 0, "CLIP_VISION"],
-    [23, 14, 0, 15, 1, "WANVIDIMAGE_CLIPEMBEDS"],
-    [24, 15, 0, 18, 1, "WANVIDIMAGE_EMBEDS"],
-    [25, 16, 0, 18, 3, "WANVIDCONTEXT"],
-    [26, 17, 0, 18, 4, "LATENT"],
-    [27, 18, 0, 19, 1, "LATENT"],
-    [28, 19, 0, 20, 1, "IMAGE"],
-    [29, 20, 0, 21, 0, "IMAGE"],
-    [30, 21, 0, 22, 0, "IMAGE"],
     [1, 1, 0, 2, 0, "IMAGE"],
     [2, 1, 0, 4, 1, "IMAGE"],
     [3, 1, 0, 14, 1, "IMAGE"],
     [4, 1, 0, 17, 0, "IMAGE"],
-    [5, 1, 0, 20, 0, "IMAGE"],
-    [6, 1, 1, 21, 1, "AUDIO"],
-    [7, 1, 1, 22, 1, "AUDIO"]
+    [5, 1, 0, 15, 2, "IMAGE"],
+    [6, 1, 0, 20, 0, "IMAGE"],
+    [7, 1, 1, 21, 1, "AUDIO"],
+    [8, 1, 1, 22, 1, "AUDIO"],
+    [9, 2, 0, 5, 0, "INT"],
+    [10, 2, 1, 5, 1, "INT"],
+    [11, 3, 0, 4, 0, "BBOX_DETECTOR"],
+    [12, 4, 0, 6, 0, "MASK"],
+    [13, 5, 0, 6, 1, "MASK"],
+    [14, 6, 0, 7, 0, "MASK"],
+    [15, 7, 0, 20, 2, "MASK"],
+    [16, 10, 0, 18, 0, "WANVIDEOMODEL"],
+    [17, 11, 0, 15, 0, "WANVAE"],
+    [18, 11, 0, 17, 1, "WANVAE"],
+    [19, 11, 0, 19, 0, "WANVAE"],
+    [20, 12, 0, 18, 2, "WANVIDEOTEXTEMBEDS"],
+    [21, 13, 0, 14, 0, "CLIP_VISION"],
+    [22, 14, 0, 15, 1, "WANVIDIMAGE_CLIPEMBEDS"],
+    [23, 15, 0, 18, 1, "WANVIDIMAGE_EMBEDS"],
+    [24, 16, 0, 18, 3, "WANVIDCONTEXT"],
+    [25, 17, 0, 18, 4, "LATENT"],
+    [26, 18, 0, 19, 1, "LATENT"],
+    [27, 19, 0, 20, 1, "IMAGE"],
+    [28, 20, 0, 21, 0, "IMAGE"],
+    [29, 21, 0, 22, 0, "IMAGE"]
   ],
   "groups": [],
   "config": {},
