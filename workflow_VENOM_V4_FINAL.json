@@ -21,7 +21,7 @@
         {"name": "LOOP", "type": "BOOLEAN", "slot_index": 6}
       ],
       "properties": {"cnr_id": "comfyui-videohelpersuite", "Node name for S&R": "VHS_LoadVideo"},
-      "widgets_values": ["input.mp4", 16, "Custom", 720, 1280, 81, 0, 1, "AnimateDiff"]
+      "widgets_values": ["video.mp4", 16, "Full", 81, 0, 1]
     },
     {
       "id": 2,
@@ -79,7 +79,7 @@
         {"name": "bboxes", "type": "BBOXES", "slot_index": 3}
       ],
       "properties": {"cnr_id": "ComfyUI-WanAnimatePreprocess", "Node name for S&R": "PoseAndFaceDetection"},
-      "widgets_values": [720, 1280]
+      "widgets_values": [0, 0]
     },
     {
       "id": 5,
@@ -179,8 +179,8 @@
       "widgets_values": [
         "umt5_xxl_fp16.safetensors",
         "bf16",
-        "Venom symbiote liquid black mask growing over the right half of the face, glossy wet black tendrils spreading, sharp white teeth, terrifying, photorealistic, 4k, macro shot, cinematic lighting",
-        "色调艳丽，过曝，静态，细节模糊不清，字幕，低质量，blurry, low quality, watermark, cartoon",
+        "Venom symbiote liquid black mask on right half of face, glossy black tendrils, sharp white teeth, terrifying, photorealistic, cinematic lighting",
+        "blurry, low quality, watermark, cartoon, distorted face",
         "disabled",
         false,
         "gpu"
@@ -329,7 +329,7 @@
         {"name": "pose_images", "type": "IMAGE", "slot_index": 0}
       ],
       "properties": {"cnr_id": "ComfyUI-WanAnimatePreprocess", "Node name for S&R": "DrawViTPose"},
-      "widgets_values": [720, 1280, 16, -1, -1, "True"]
+      "widgets_values": [0, 0, 16, -1, -1, "True"]
     },
     {
       "id": 21,
@@ -399,7 +399,7 @@
         {"name": "WANVIDIMAGE_EMBEDS", "type": "WANVIDIMAGE_EMBEDS", "slot_index": 0}
       ],
       "properties": {"cnr_id": "ComfyUI-WanVideoWrapper", "Node name for S&R": "WanVideoImageToVideoEncode"},
-      "widgets_values": [720, 1280, 81, 0.0, 1.0, 1.0, true]
+      "widgets_values": [0, 0, 81, 0.0, 1.0, 1.0, true]
     },
     {
       "id": 30,
