@@ -9,7 +9,6 @@ import subprocess
 import modal
 from pathlib import Path
 
-# ============ КОНСТАНТЫ ============
 MODELS_BASE = "/cache/models"
 INPUT_DIR = "/cache/input"
 OUTPUT_DIR = "/cache/output"
@@ -28,20 +27,16 @@ MODEL_DIRS = {
     "onnx": f"{MODELS_BASE}/onnx",
 }
 
-# ============ MODAL APP & VOLUME ============
 app = modal.App("comfyui-wan22-venom-master")
 volume = modal.Volume.from_name("comfy-storage", create_if_missing=True)
 
 
-# ============ УТИЛИТА 1: Patch WanVideoWrapper ============
 def _patch_wanwrapper(nodes_py: Path) -> int:
     if not nodes_py.exists():
         print(f"[WARN] nodes.py not found: {nodes_py}")
         return 0
-
     content = nodes_py.read_text(encoding="utf-8")
     original = content
-
     import re
     patterns = [
         (r'\bH\b,\s*\bH\b', 'H, W'),
@@ -49,10 +44,8 @@ def _patch_wanwrapper(nodes_py: Path) -> int:
         (r'_h,\s*_h', '_h, _w'),
         (r'_H,\s*_H', '_H, _W'),
     ]
-
     for pattern, replacement in patterns:
         content = re.sub(pattern, replacement, content)
-
     if content != original:
         nodes_py.write_text(content, encoding="utf-8")
         count = sum(1 for p, r in patterns if p in original)
@@ -63,18 +56,14 @@ def _patch_wanwrapper(nodes_py: Path) -> int:
         return 0
 
 
-# ============ УТИЛИТА 2: Safe Download ============
 def safe_download(repo: str, filepath: str, out_dir: str, target_name: str, 
                   token: str, max_retries: int = 3) -> None:
     os.makedirs(out_dir, exist_ok=True)
     target_path = os.path.join(out_dir, target_name)
-
     if os.path.exists(target_path) and os.path.getsize(target_path) > 10 * 1024 * 1024:
         print(f"[SKIP] {target_name} already cached")
         return
-
     from huggingface_hub import hf_hub_download
-
     for attempt in range(max_retries):
         try:
             print(f"[DOWNLOAD] {target_name} (attempt {attempt + 1}/{max_retries})")
@@ -99,7 +88,6 @@ def safe_download(repo: str, filepath: str, out_dir: str, target_name: str,
                 print(f"[FAIL] Failed to download {target_name} after {max_retries} attempts")
 
 
-# ============ DOCKER IMAGE ============
 comfy_image = (
     modal.Image.debian_slim(python_version='3.11')
     .apt_install(
@@ -110,7 +98,7 @@ comfy_image = (
         "torch==2.4.1",
         "torchvision==0.19.1",
         "torchaudio==2.4.1",
-        index_url="https://download.pytorch.org/whl/cu124"
+        index_url="https://download.pytorch.org/whl/cu121"
     )
     .pip_install(
         "huggingface_hub",
@@ -121,21 +109,19 @@ comfy_image = (
         "sentencepiece",
         "einops",
         "onnxruntime-gpu",
-        "opencv-python-headless==4.10.0.84",
         "ultralytics",
         "diffusers>=0.29.0",
         "pygit2",
-        "pyyaml",
-        "numpy",
-        "scikit-image",
+        "sageattention",
+        "gguf",
     )
     .run_commands(
         "mkdir -p /workspace && "
         "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git && "
         "cd /workspace/ComfyUI && pip install -r requirements.txt && "
-        "pip uninstall -y opencv-python opencv-contrib-python || true && "
+        # First uninstall ALL opencv, THEN install headless
+        "pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true && "
         "pip install --no-cache-dir opencv-python-headless==4.10.0.84 && "
-        "pip install --no-cache-dir scikit-image && "
         "cd /workspace/ComfyUI/custom_nodes && "
         "git clone https://github.com/ltdrdata/ComfyUI-Manager.git && "
         "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && "
@@ -145,12 +131,17 @@ comfy_image = (
         "git clone https://github.com/kijai/ComfyUI-WanAnimatePreprocess.git && "
         "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
         "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && pip install -r requirements.txt || true"
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-segment-anything-2 && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanAnimatePreprocess && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py"
     )
 )
 
 
-# ============ ФУНКЦИЯ: Download Models ============
 @app.function(
     image=comfy_image,
     volumes={'/cache': volume},
@@ -162,7 +153,6 @@ comfy_image = (
 def download_models():
     volume.reload()
     token = os.environ.get('HF_TOKEN')
-
     DOWNLOADS = [
         ('Comfy-Org/Wan_2.1_ComfyUI_repackaged',
          'split_files/clip_vision/clip_vision_h.safetensors',
@@ -189,15 +179,12 @@ def download_models():
          'sam2.1_hiera_large.safetensors',
          MODEL_DIRS['sams'], 'sam2.1_hiera_large.safetensors'),
     ]
-
     for repo, filepath, out_dir, name in DOWNLOADS:
         safe_download(repo, filepath, out_dir, name, token)
-
     volume.commit()
     print("[DONE] All models downloaded!")
 
 
-# ============ ФУНКЦИЯ: Serve ComfyUI ============
 @app.function(
     image=comfy_image,
     gpu='A100-80GB',
@@ -207,16 +194,14 @@ def download_models():
     max_containers=1
 )
 @modal.web_server(port=8188, startup_timeout=900)
+@modal.concurrent(max_inputs=100)
 def serve():
     volume.reload()
     os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
-
     for d in list(MODEL_DIRS.values()) + [INPUT_DIR, OUTPUT_DIR, TORCH_CACHE]:
         os.makedirs(d, exist_ok=True)
-
     nodes_py = Path(f'{CUSTOM_NODES_DIR}/ComfyUI-WanVideoWrapper/nodes.py')
     _patch_wanwrapper(nodes_py)
-
     comfy_models = "/workspace/ComfyUI/models"
     symlink_map = {
         "detection": MODEL_DIRS['detection'],
@@ -224,39 +209,51 @@ def serve():
         "sams": MODEL_DIRS['sams'],
         "onnx": MODEL_DIRS['onnx'],
     }
-
     for name, target in symlink_map.items():
         link_path = os.path.join(comfy_models, name)
         if os.path.islink(link_path):
             os.unlink(link_path)
         elif os.path.exists(link_path):
-            if os.path.isdir(link_path):
-                shutil.rmtree(link_path)
-            else:
-                os.remove(link_path)
+            shutil.rmtree(link_path)
         os.symlink(target, link_path)
         print(f"[SYMLINK] {link_path} -> {target}")
-
-    # Extra model paths via YAML only (no custom node needed)
-    extra_paths_yaml = '''MODAL_STORAGE:
-  base_path: "/cache/models"
-  models_unet: "diffusion_models"
-  models_clip: "clip"
-  models_vae: "vae"
-  models_lora: "loras"
-  models_clip_vision: "clip_vision"
-  models_controlnet: "controlnet"
-  models_upscalers: "upscalers"
-  models_embeddings: "embeddings"
+    zzz_paths_fix = '''"""
+Path fix for detection/sams/ultralytics/onnx models.
+"""
+from folder_paths import folder_paths
+NODE_CLASS_MAPPINGS = {}
+NODE_DISPLAY_NAME_MAPPINGS = {}
+for name, path in {
+    "detection": "/cache/models/detection",
+    "sams": "/cache/models/sams",
+    "ultralytics": "/cache/models/ultralytics/bbox",
+    "onnx": "/cache/models/onnx",
+}.items():
+    if name not in folder_paths.folder_names:
+        folder_paths.folder_names[name] = []
+    if path not in folder_paths.folder_names[name]:
+        folder_paths.folder_names[name].append(path)
+'''
+    zzz_path = os.path.join(CUSTOM_NODES_DIR, 'zzz_paths_fix.py')
+    Path(zzz_path).write_text(zzz_paths_fix, encoding="utf-8")
+    print(f"[WRITE] {zzz_path}")
+    extra_paths_yaml = '''modal_storage:
+  base_path: /cache/models
+  unet: diffusion_models
+  clip: clip
+  vae: vae
+  loras: loras
+  clip_vision: clip_vision
+  controlnet: controlnet
+  upscalers: upscalers
+  embeddings: embeddings
+  vae_approx: vae_approx
 '''
     yaml_path = "/workspace/ComfyUI/extra_model_paths.yaml"
     Path(yaml_path).write_text(extra_paths_yaml, encoding="utf-8")
     print(f"[WRITE] {yaml_path}")
-
     os.chdir('/workspace/ComfyUI')
-
-    # Run server directly
-    subprocess.call([
+    return subprocess.Popen([
         sys.executable, 'main.py',
         '--listen', '0.0.0.0',
         '--port', '8188',
@@ -265,7 +262,6 @@ def serve():
     ])
 
 
-# ============ ENTRYPOINT ============
 @app.local_entrypoint()
 def main():
     download_models.remote()
