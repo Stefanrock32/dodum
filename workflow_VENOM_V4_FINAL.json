@@ -1,6 +1,6 @@
 {
-  "last_node_id": 35,
-  "last_link_id": 43,
+  "last_node_id": 42,
+  "last_link_id": 55,
   "nodes": [
     {
       "id": 1,
@@ -262,7 +262,7 @@
     {
       "id": 17,
       "type": "VHS_VideoCombine",
-      "pos": [2750, 700],
+      "pos": [3200, 700],
       "size": [400, 270],
       "flags": {},
       "order": 14,
@@ -322,7 +322,7 @@
       "properties": {"cnr_id": "comfyui-videohelpersuite", "Node name for S&R": "VHS_VideoCombine"},
       "widgets_values": {
         "frame_rate": 16,
-        "filename_prefix": "DEBUG_Mask",
+        "filename_prefix": "DEBUG_FullMask",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
         "crf": 23,
@@ -437,7 +437,7 @@
       "mode": 0,
       "inputs": [
         {"name": "samples", "type": "LATENT", "link": 31, "slot_index": 0},
-        {"name": "mask", "type": "MASK", "link": 32, "slot_index": 1}
+        {"name": "mask", "type": "MASK", "link": 50, "slot_index": 1}
       ],
       "outputs": [
         {"name": "LATENT", "type": "LATENT", "slot_index": 0}
@@ -448,7 +448,7 @@
     {
       "id": 32,
       "type": "ImageCompositeMasked",
-      "pos": [2750, 400],
+      "pos": [2750, 700],
       "size": [315, 262],
       "flags": {},
       "order": 23,
@@ -456,7 +456,7 @@
       "inputs": [
         {"name": "destination", "type": "IMAGE", "link": 33, "slot_index": 0},
         {"name": "source", "type": "IMAGE", "link": 34, "slot_index": 1},
-        {"name": "mask", "type": "MASK", "link": 35, "slot_index": 2}
+        {"name": "mask", "type": "MASK", "link": 51, "slot_index": 2}
       ],
       "outputs": [
         {"name": "IMAGE", "type": "IMAGE", "slot_index": 0}
@@ -496,6 +496,59 @@
       ],
       "properties": {"cnr_id": "ComfyUI-WanVideoWrapper", "Node name for S&R": "WanVideoSetBlockSwap"},
       "widgets_values": []
+    },
+    {
+      "id": 40,
+      "type": "ImageCrop",
+      "pos": [2300, 100],
+      "size": [315, 262],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 40, "slot_index": 0}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "slot_index": 0}
+      ],
+      "properties": {"cnr_id": "comfyui-kjnodes", "Node name for S&R": "ImageCrop"},
+      "widgets_values": [0.5, 0.0, 1.0, 1.0]
+    },
+    {
+      "id": 41,
+      "type": "MaskToImage",
+      "pos": [2750, 100],
+      "size": [315, 262],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {"name": "mask", "type": "MASK", "link": 52, "slot_index": 0}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "slot_index": 0}
+      ],
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "MaskToImage"},
+      "widgets_values": []
+    },
+    {
+      "id": 42,
+      "type": "ImageCompositeMasked",
+      "pos": [3200, 100],
+      "size": [315, 262],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {"name": "destination", "type": "IMAGE", "link": 53, "slot_index": 0},
+        {"name": "source", "type": "IMAGE", "link": 54, "slot_index": 1},
+        {"name": "mask", "type": "MASK", "link": 55, "slot_index": 2}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "slot_index": 0}
+      ],
+      "properties": {"cnr_id": "comfy-core", "Node name for S&R": "ImageCompositeMasked"},
+      "widgets_values": [0, 0, false]
     }
   ],
   "links": [
@@ -529,13 +582,18 @@
     [29, 28, 0, 29, 1, "WANVIDIMAGE_CLIPEMBEDS"],
     [30, 1, 0, 29, 2, "IMAGE"],
     [31, 13, 0, 30, 0, "LATENT"],
-    [32, 7, 0, 30, 1, "MASK"],
     [33, 1, 0, 32, 0, "IMAGE"],
     [34, 16, 0, 32, 1, "IMAGE"],
-    [35, 7, 0, 32, 2, "MASK"],
     [36, 8, 0, 35, 0, "WANVIDEOMODEL"],
     [37, 33, 0, 35, 1, "BLOCKSWAPARGS"],
-    [38, 35, 0, 15, 0, "WANVIDEOMODEL"]
+    [38, 35, 0, 15, 0, "WANVIDEOMODEL"],
+    [40, 41, 0, 40, 0, "IMAGE"],
+    [50, 7, 0, 30, 1, "MASK"],
+    [51, 7, 0, 32, 2, "MASK"],
+    [52, 7, 0, 41, 0, "MASK"],
+    [53, 40, 0, 42, 0, "IMAGE"],
+    [54, 16, 0, 42, 1, "IMAGE"],
+    [55, 7, 0, 42, 2, "MASK"]
   ],
   "groups": [],
   "config": {},
