@@ -159,7 +159,6 @@ comfy_image = (
     .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git")
     .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git")
     .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git")
-    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git")
     .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git")
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py")
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Subpack && pip install -r requirements.txt || true")
@@ -168,7 +167,6 @@ comfy_image = (
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true")
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true")
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true")
-    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py")
     .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI_wav2lip && pip install -r requirements.txt || true")
 )
 
