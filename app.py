@@ -141,30 +141,28 @@ comfy_image = (
         "pygit2",
         "sageattention",
         "gguf",
-        "librosa",
         "scipy",
     )
-    .run_commands(
-        "mkdir -p /workspace && "
-        "cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git && "
-        "cd /workspace/ComfyUI && pip install -r requirements.txt && "
-        "pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true && "
-        "pip install --no-cache-dir opencv-python-headless==4.10.0.84 && "
-        "cd /workspace/ComfyUI/custom_nodes && "
-        "git clone https://github.com/ltdrdata/ComfyUI-Manager.git && "
-        "git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && "
-        "git clone https://github.com/kijai/ComfyUI-KJNodes.git && "
-        "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git && "
-        "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
-        "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
-        "git clone https://github.com/ShmuelRonen/ComfyUI_wav2lip.git && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI_wav2lip && pip install -r requirements.txt || true && "
-    )
+    .pip_install("opencv-python-headless==4.10.0.84")
+    .pip_install("librosa")
+    .run_commands("mkdir -p /workspace")
+    .run_commands("cd /workspace && git clone https://github.com/comfyanonymous/ComfyUI.git")
+    .run_commands("cd /workspace/ComfyUI && pip install -r requirements.txt")
+    .run_commands("pip uninstall -y opencv-python opencv-python-headless opencv-contrib-python || true")
+    .run_commands("pip install --no-cache-dir opencv-python-headless==4.10.0.84")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Manager.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/kijai/ComfyUI-KJNodes.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes && git clone https://github.com/ShmuelRonen/ComfyUI_wav2lip.git")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py")
+    .run_commands("cd /workspace/ComfyUI/custom_nodes/ComfyUI_wav2lip && pip install -r requirements.txt || true")
 )
 
 

@@ -20,18 +20,18 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["INT", "width", []],
-        ["INT", "height", []],
+        ["INT", "width", [8]],
+        ["INT", "height", [9]],
         ["INT", "count", []]
       ]
     },
     {
       "id": 3,
       "type": "UltralyticsDetectorProvider",
-      "widgets_values": ["face_yolov8m.pt"],
+      "widgets_values": ["bbox/face_yolov8m.pt"],
       "inputs": [],
       "outputs": [
-        ["BBOX_DETECTOR", "bbox_detector", []]
+        ["BBOX_DETECTOR", "bbox_detector", [12]]
       ]
     },
     {
@@ -43,21 +43,19 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", []]
+        ["MASK", "mask", [13]]
       ]
     },
     {
       "id": 5,
-      "type": "MaskRectArea",
-      "widgets_values": [50, 0, 50, 100, 720, 1280, 0],
+      "type": "MaskRect",
+      "widgets_values": [50, 0, 50, 100, 0],
       "inputs": [
-        ["INT", "x", [["2", 0]]],
-        ["INT", "y", [["2", 1]]],
-        ["INT", "w", [["2", 0]]],
-        ["INT", "h", [["2", 1]]]
+        ["INT", "width", [["2", 0]]],
+        ["INT", "height", [["2", 1]]]
       ],
       "outputs": [
-        ["MASK", "mask", []]
+        ["MASK", "mask", [14]]
       ]
     },
     {
@@ -69,7 +67,7 @@
         ["MASK", "mask_b", [["5", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", []]
+        ["MASK", "mask", [15]]
       ]
     },
     {
@@ -80,7 +78,7 @@
         ["MASK", "mask", [["6", 0]]]
       ],
       "outputs": [
-        ["MASK", "mask", []]
+        ["MASK", "mask", [16]]
       ]
     },
     {
@@ -89,7 +87,7 @@
       "widgets_values": ["wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors", "fp16_fast", "fp8_e4m3fn", "main_device", "sageattn", "default"],
       "inputs": [],
       "outputs": [
-        ["WANVIDEOMODEL", "model", []]
+        ["WANVIDEOMODEL", "model", [17]]
       ]
     },
     {
@@ -98,16 +96,16 @@
       "widgets_values": ["wan_2.1_vae.safetensors", "bf16"],
       "inputs": [],
       "outputs": [
-        ["WANVAE", "vae", []]
+        ["WANVAE", "vae", [18, 19, 20]]
       ]
     },
     {
       "id": 12,
       "type": "WanVideoTextEncodeCached",
-      "widgets_values": ["umt5_xxl_fp16.safetensors", "bf16", "Venom symbiote mask on right half of face, black glossy liquid tendrils, white sharp teeth, terrifying expression, photorealistic", "blurry, low quality, watermark, cartoon, distorted face", "disabled", false, "gpu"],
+      "widgets_values": ["umt5_xxl_fp16.safetensors", "bf16", "Venom", "", "disabled", false, "gpu"],
       "inputs": [],
       "outputs": [
-        ["WANVIDEOTEXTEMBEDS", "text_embeds", []]
+        ["WANVIDEOTEXTEMBEDS", "text_embeds", [21]]
       ]
     },
     {
@@ -116,7 +114,7 @@
       "widgets_values": ["clip_vision_h.safetensors"],
       "inputs": [],
       "outputs": [
-        ["CLIP_VISION", "clip_vision", []]
+        ["CLIP_VISION", "clip_vision", [22]]
       ]
     },
     {
@@ -128,20 +126,20 @@
         ["IMAGE", "image", [["1", 0]]]
       ],
       "outputs": [
-        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", []]
+        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", [23]]
       ]
     },
     {
       "id": 15,
       "type": "WanVideoImageToVideoEncode",
-      "widgets_values": [1280, 720, 81, 0.0, 1.0, 1.0, true],
+      "widgets_values": [720, 1280, 81, 0.0, 1.0, 1.0, true],
       "inputs": [
         ["WANVAE", "vae", [["11", 0]]],
         ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", [["14", 0]]],
         ["IMAGE", "start_image", [["1", 0]]]
       ],
       "outputs": [
-        ["WANVIDIMAGE_EMBEDS", "image_embeds", []]
+        ["WANVIDIMAGE_EMBEDS", "image_embeds", [24]]
       ]
     },
     {
@@ -150,7 +148,7 @@
       "widgets_values": ["static_standard", 81, 4, 32, true, false, "linear"],
       "inputs": [],
       "outputs": [
-        ["WANVIDCONTEXT", "context_opts", []]
+        ["WANVIDCONTEXT", "context_opts", [25]]
       ]
     },
     {
@@ -162,7 +160,7 @@
         ["WANVAE", "vae", [["11", 0]]]
       ],
       "outputs": [
-        ["LATENT", "latent", []]
+        ["LATENT", "latent", [26]]
       ]
     },
     {
@@ -177,7 +175,7 @@
         ["LATENT", "samples", [["17", 0]]]
       ],
       "outputs": [
-        ["LATENT", "latent", []]
+        ["LATENT", "latent", [27]]
       ]
     },
     {
@@ -189,7 +187,7 @@
         ["LATENT", "samples", [["18", 0]]]
       ],
       "outputs": [
-        ["IMAGE", "image", []]
+        ["IMAGE", "image", [28]]
       ]
     },
     {
@@ -202,7 +200,7 @@
         ["MASK", "mask", [["7", 0]]]
       ],
       "outputs": [
-        ["IMAGE", "image", []]
+        ["IMAGE", "image", [29]]
       ]
     },
     {
@@ -214,7 +212,7 @@
         ["AUDIO", "audio", [["1", 1]]]
       ],
       "outputs": [
-        ["IMAGE", "image", []]
+        ["IMAGE", "image", [30]]
       ]
     },
     {
@@ -242,17 +240,8 @@
     }
   ],
   "links": [
-    [1, 1, 0, 2, 0, "IMAGE"],
-    [2, 1, 0, 4, 1, "IMAGE"],
-    [3, 1, 0, 14, 1, "IMAGE"],
-    [4, 1, 0, 17, 0, "IMAGE"],
-    [5, 1, 0, 20, 0, "IMAGE"],
-    [6, 1, 1, 21, 1, "AUDIO"],
-    [7, 1, 1, 22, 1, "AUDIO"],
     [8, 2, 0, 5, 0, "INT"],
-    [9, 2, 0, 5, 2, "INT"],
-    [10, 2, 1, 5, 1, "INT"],
-    [11, 2, 1, 5, 3, "INT"],
+    [9, 2, 1, 5, 1, "INT"],
     [12, 3, 0, 4, 0, "BBOX_DETECTOR"],
     [13, 4, 0, 6, 0, "MASK"],
     [14, 5, 0, 6, 1, "MASK"],
@@ -271,7 +260,14 @@
     [27, 18, 0, 19, 1, "LATENT"],
     [28, 19, 0, 20, 1, "IMAGE"],
     [29, 20, 0, 21, 0, "IMAGE"],
-    [30, 21, 0, 22, 0, "IMAGE"]
+    [30, 21, 0, 22, 0, "IMAGE"],
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 1, 0, 4, 1, "IMAGE"],
+    [3, 1, 0, 14, 1, "IMAGE"],
+    [4, 1, 0, 17, 0, "IMAGE"],
+    [5, 1, 0, 20, 0, "IMAGE"],
+    [6, 1, 1, 21, 1, "AUDIO"],
+    [7, 1, 1, 22, 1, "AUDIO"]
   ],
   "groups": [],
   "config": {},
