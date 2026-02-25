@@ -127,6 +127,7 @@ comfy_image = (
         "pygit2",
         "pyyaml",
         "numpy",
+        "scikit-image",
     )
     .run_commands(
         "mkdir -p /workspace && "
