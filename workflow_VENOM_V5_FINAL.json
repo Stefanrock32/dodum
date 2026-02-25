@@ -1,0 +1,259 @@
+{
+  "last_node_id": 22,
+  "last_link_id": 35,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "VHS_LoadVideo",
+      "widgets_values": ["video.mp4", 16, 0, 0, 81, 0, 1, "AnimateDiff"],
+      "inputs": [],
+      "outputs": [
+        ["IMAGE", "image", [["2", 0]]],
+        ["AUDIO", "audio", [["22", 1], ["21", 1]]]
+      ]
+    },
+    {
+      "id": 2,
+      "type": "GetImageSizeAndCount",
+      "widgets_values": [],
+      "inputs": [
+        ["IMAGE", "image", [["1", 0]]]
+      ],
+      "outputs": [
+        ["INT", "width", []],
+        ["INT", "height", []],
+        ["INT", "count", []]
+      ]
+    },
+    {
+      "id": 3,
+      "type": "UltralyticsDetectorProvider",
+      "widgets_values": ["bbox/face_yolov8m.pt"],
+      "inputs": [],
+      "outputs": [
+        ["BBOX_DETECTOR", "bbox_detector", [["4", 0]]]
+      ]
+    },
+    {
+      "id": 4,
+      "type": "BboxDetectorCombined_v2",
+      "widgets_values": [0.5, 10],
+      "inputs": [
+        ["BBOX_DETECTOR", "bbox_detector", [["3", 0]]],
+        ["IMAGE", "image", [["1", 0]]]
+      ],
+      "outputs": [
+        ["MASK", "mask", [["6", 0]]]
+      ]
+    },
+    {
+      "id": 5,
+      "type": "MaskRectArea",
+      "widgets_values": [50, 0, 50, 100, 720, 1280, 0],
+      "inputs": [],
+      "outputs": [
+        ["MASK", "mask", [["6", 1]]]
+      ]
+    },
+    {
+      "id": 6,
+      "type": "BitwiseAndMask",
+      "widgets_values": [],
+      "inputs": [
+        ["MASK", "mask_a", [["4", 0]]],
+        ["MASK", "mask_b", [["5", 0]]]
+      ],
+      "outputs": [
+        ["MASK", "mask", [["7", 0]]]
+      ]
+    },
+    {
+      "id": 7,
+      "type": "GrowMaskWithBlur",
+      "widgets_values": [10, 0.0, true, 8, 1.0, 1.0, false],
+      "inputs": [
+        ["MASK", "mask", [["6", 0]]]
+      ],
+      "outputs": [
+        ["MASK", "mask", [["20", 2]]]
+      ]
+    },
+    {
+      "id": 10,
+      "type": "WanVideoModelLoader",
+      "widgets_values": ["wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors", "fp16_fast", "fp8_e4m3fn", "main_device", "sageattn", "default"],
+      "inputs": [],
+      "outputs": [
+        ["WANVIDEOMODEL", "model", [["17", 0], ["18", 0]]]
+      ]
+    },
+    {
+      "id": 11,
+      "type": "WanVideoVAELoader",
+      "widgets_values": ["wan_2.1_vae.safetensors", "bf16"],
+      "inputs": [],
+      "outputs": [
+        ["WANVAE", "vae", [["17", 1], ["15", 0], ["19", 1]]]
+      ]
+    },
+    {
+      "id": 12,
+      "type": "WanVideoTextEncodeCached",
+      "widgets_values": ["umt5_xxl_fp16.safetensors", "bf16", "Venom symbiote mask on right half of face, black glossy liquid tendrils spreading, white sharp teeth, terrifying expression, photorealistic, cinematic lighting", "blurry, low quality, watermark, cartoon, distorted face", "disabled", false, "gpu"],
+      "inputs": [],
+      "outputs": [
+        ["WANVIDEOTEXTEMBEDS", "text_embeds", [["18", 2]]]
+      ]
+    },
+    {
+      "id": 13,
+      "type": "CLIPVisionLoader",
+      "widgets_values": ["clip_vision_h.safetensors"],
+      "inputs": [],
+      "outputs": [
+        ["CLIP_VISION", "clip_vision", [["14", 0]]]
+      ]
+    },
+    {
+      "id": 14,
+      "type": "WanVideoClipVisionEncode",
+      "widgets_values": [1.0, 1.0, "center", "average", true, 0, 0.5],
+      "inputs": [
+        ["CLIP_VISION", "clip_vision", [["13", 0]]],
+        ["IMAGE", "image", [["1", 0]]]
+      ],
+      "outputs": [
+        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", [["15", 1]]]
+      ]
+    },
+    {
+      "id": 15,
+      "type": "WanVideoImageToVideoEncode",
+      "widgets_values": [1280, 720, 81, 0.0, 1.0, 1.0, true],
+      "inputs": [
+        ["WANVAE", "vae", [["11", 0]]],
+        ["WANVIDIMAGE_CLIPEMBEDS", "clip_embeds", [["14", 0]]]
+      ],
+      "outputs": [
+        ["WANVIDIMAGE_EMBEDS", "image_embeds", [["18", 1]]]
+      ]
+    },
+    {
+      "id": 16,
+      "type": "WanVideoContextOptions",
+      "widgets_values": ["static_standard", 81, 4, 32, true, false, "linear"],
+      "inputs": [],
+      "outputs": [
+        ["WANVIDCONTEXT", "context_opts", [["18", 3]]]
+      ]
+    },
+    {
+      "id": 17,
+      "type": "WanVideoEncode",
+      "widgets_values": [],
+      "inputs": [
+        ["WANVIDEOMODEL", "model", [["10", 0]]],
+        ["WANVAE", "vae", [["11", 0]]],
+        ["IMAGE", "image", [["1", 0]]]
+      ],
+      "outputs": [
+        ["LATENT", "latent", [["18", 4]]]
+      ]
+    },
+    {
+      "id": 18,
+      "type": "WanVideoSampler",
+      "widgets_values": [30, 6.0, 5.0, 42, "fixed", true, "euler", 0, 1, "", "comfy", 0, -1, false],
+      "inputs": [
+        ["WANVIDEOMODEL", "model", [["10", 0], ["11", 0], ["12", 0]]],
+        ["WANVIDIMAGE_EMBEDS", "image_embeds", [["15", 0]]],
+        ["WANVIDEOTEXTEMBEDS", "text_embeds", [["12", 0]]],
+        ["WANVIDCONTEXT", "context_opts", [["16", 0]]],
+        ["LATENT", "latent", [["17", 0]]]
+      ],
+      "outputs": [
+        ["LATENT", "latent", [["19", 2]]]
+      ]
+    },
+    {
+      "id": 19,
+      "type": "WanVideoDecode",
+      "widgets_values": [false, 272, 272, 144, 128, "default"],
+      "inputs": [
+        ["WANVIDEOMODEL", "model", [["12", 0]]],
+        ["WANVAE", "vae", [["11", 0]]],
+        ["LATENT", "latent", [["18", 0]]]
+      ],
+      "outputs": [
+        ["IMAGE", "image", [["20", 1]]]
+      ]
+    },
+    {
+      "id": 20,
+      "type": "ImageCompositeMasked",
+      "widgets_values": [0, 0, false],
+      "inputs": [
+        ["IMAGE", "background", [["1", 0]]],
+        ["IMAGE", "image", [["19", 0]]],
+        ["MASK", "mask", [["7", 0]]]
+      ],
+      "outputs": [
+        ["IMAGE", "image", [["21", 0]]]
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Wav2Lip",
+      "widgets_values": ["wav2lip_gan", 0, 0],
+      "inputs": [
+        ["IMAGE", "image", [["20", 0]]],
+        ["AUDIO", "audio", [["1", 1]]]
+      ],
+      "outputs": [
+        ["IMAGE", "image", [["22", 0]]]
+      ]
+    },
+    {
+      "id": 22,
+      "type": "VHS_VideoCombine",
+      "widgets_values": {"frame_rate": 24, "loop_count": 0, "filename_prefix": "Venom_Final", "format": "video/h264-mp4", "pix_fmt": "yuv420p", "crf": 17, "save_metadata": true, "trim_to_audio": false, "pingpong": false, "save_output": true},
+      "inputs": [
+        ["IMAGE", "images", [["21", 0]]],
+        ["AUDIO", "audio", [["1", 1]]]
+      ],
+      "outputs": [
+        ["VHS_VIDEO", "video", []]
+      ]
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "IMAGE"],
+    [2, 3, 0, 4, 0, "BBOX_DETECTOR"],
+    [3, 1, 0, 4, 1, "IMAGE"],
+    [4, 4, 0, 6, 0, "MASK"],
+    [5, 5, 0, 6, 1, "MASK"],
+    [6, 6, 0, 7, 0, "MASK"],
+    [10, 10, 0, 17, 0, "WANVIDEOMODEL"],
+    [11, 10, 0, 18, 0, "WANVIDEOMODEL"],
+    [12, 10, 0, 19, 0, "WANVIDEOMODEL"],
+    [13, 11, 0, 17, 1, "WANVAE"],
+    [14, 11, 0, 15, 0, "WANVAE"],
+    [15, 11, 0, 19, 1, "WANVAE"],
+    [16, 12, 0, 18, 2, "WANVIDEOTEXTEMBEDS"],
+    [17, 13, 0, 14, 0, "CLIP_VISION"],
+    [18, 1, 0, 14, 1, "IMAGE"],
+    [19, 14, 0, 15, 1, "WANVIDIMAGE_CLIPEMBEDS"],
+    [20, 15, 0, 18, 1, "WANVIDIMAGE_EMBEDS"],
+    [21, 16, 0, 18, 3, "WANVIDCONTEXT"],
+    [22, 1, 0, 17, 2, "IMAGE"],
+    [23, 17, 0, 18, 4, "LATENT"],
+    [24, 18, 0, 19, 2, "LATENT"],
+    [25, 19, 0, 20, 1, "IMAGE"],
+    [26, 1, 0, 20, 0, "IMAGE"],
+    [27, 7, 0, 20, 2, "MASK"],
+    [28, 20, 0, 21, 0, "IMAGE"],
+    [29, 1, 1, 21, 1, "AUDIO"],
+    [30, 21, 0, 22, 0, "IMAGE"],
+    [31, 1, 1, 22, 1, "AUDIO"]
+  ]
+}
