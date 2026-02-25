@@ -131,7 +131,7 @@
         {"name": "mask_inverted", "type": "MASK", "slot_index": 1}
       ],
       "properties": {"cnr_id": "comfyui-kjnodes", "Node name for S&R": "GrowMaskWithBlur"},
-      "widgets_values": [15, 0.0, true, 12, 1.0, 1.0, false]
+      "widgets_values": [8, 0.0, true, 6, 1.0, 1.0, false]
     },
     {
       "id": 8,
@@ -179,7 +179,7 @@
       "widgets_values": [
         "umt5_xxl_fp16.safetensors",
         "bf16",
-        "Venom symbiote liquid black mask on right half of face, glossy black tendrils, sharp white teeth, terrifying, photorealistic, cinematic lighting",
+        "Venom symbiote mask on right half of face, black glossy liquid, terrifying teeth, cinematic lighting",
         "blurry, low quality, watermark, cartoon, distorted face",
         "disabled",
         false,
@@ -399,7 +399,7 @@
         {"name": "WANVIDIMAGE_EMBEDS", "type": "WANVIDIMAGE_EMBEDS", "slot_index": 0}
       ],
       "properties": {"cnr_id": "ComfyUI-WanVideoWrapper", "Node name for S&R": "WanVideoImageToVideoEncode"},
-      "widgets_values": [0, 0, 81, 0.0, 1.0, 1.0, true]
+      "widgets_values": [1280, 720, 81, 0.0, 1.0, 1.0, true]
     },
     {
       "id": 30,
