@@ -19,6 +19,26 @@ You will be invoked with: `$ARGUMENTS`
 
 If any of these are missing, **ASK ONE TIGHT QUESTION** to fill the gap before writing. Never guess silently.
 
+Today's date for trend recency: !`date +%Y-%m-%d`
+
+---
+
+## TikTok 2026 Algorithm Map (treat this as ground truth)
+
+The algorithm in 2025–2026 is dramatically clearer than older guides suggest. Internalize these facts before writing:
+
+- **Three-stage distribution funnel.** Every video runs through (1) Seed Audience: 200–500 viewers, (2) Expanded Cohort: 5K–50K, (3) Broad Distribution: 100K+. You only unlock the next stage if metrics in the previous one beat thresholds. The script must be engineered for the Seed cliff first — the rest is downstream.
+- **#1 ranking signal is Watch Time / Completion Rate** (estimated 40–50% of total weight). Completion-rate bar for virality has risen to **~70%** for sub-60s in 2026 (up from ~50% in 2024).
+- **Watch Time Density** (uninterrupted attention in the first 10s) is the new sub-metric that gates the seed → expanded jump. Target ≥ 60% retention at the 10s mark.
+- **3-second gatekeeper**: ≥ 50–60% of viewers must still be watching at t=3s. Drop below that and stage 2 never unlocks.
+- **Saves and shares now outweigh likes.** Likes are the weakest engagement signal. Engineer one save trigger and one share trigger per video, minimum.
+- **DM shares > public shares.** A share that triggers a DM ("send this to your sister") signals stronger than a public re-post. Identity statements and "send this to ___" prompts are DM bait.
+- **Replays are the strongest single signal.** Two consecutive views by the same user is the algorithm's clearest "this is special" flag. Engineer a loop trigger.
+- **First 60 minutes after upload determine velocity.** The algorithm watches engagement velocity, not absolute counts. Reply to first 3 comments inside 10 minutes; do not edit caption / cover / change anything.
+- **Followers don't matter for reach.** Every video re-tested independently. A new account can outrank a 5M-follower account on the same FYP slot.
+- **Five viral content patterns reliably trigger algorithm signals**: (a) Delayed Reveal — promise a payoff and withhold it, (b) Controversy Loop — polarizing claim that begs comments, (c) Save-Worthy Tutorial — step-by-step a viewer wants to keep, (d) Relatable Story — identity-resonant micro-narrative, (e) Unexpected Comparison — two things juxtaposed in a way the viewer hasn't seen. Every script you write should map cleanly onto **at least one** of these.
+- **Authoritative trend sources**: TikTok Creative Center (`https://ads.tiktok.com/business/creativecenter`) for trending sounds, hashtags, creators by region; TikTok Creator Search Insights inside the app for what real users are searching for. Reference these — don't invent trend names.
+
 ---
 
 ## Mental Model: The Five Forces of TikTok Retention (2025–2026)
@@ -38,10 +58,11 @@ A script is only ready when **every one** of these is hit. If even one is weak, 
 ## Step 1 — Research & Recon (always do this first)
 
 1. Re-read `$ARGUMENTS` and silently restate: niche, topic, length, retention goal, tone.
-2. If the niche is volatile (trends change weekly), run `web_search` for:
-   - `"top TikTok hooks <niche> 2026"`
+2. If the niche is volatile (trends change weekly), run `web_search` for (use today's date !`date +%Y-%m-%d` for freshness):
+   - `"top TikTok hooks <niche> <today's year>"`
    - `"TikTok viral format <niche> this week"`
    - `"<topic> TikTok stitch trend"`
+   - `"TikTok Creative Center trending sounds <locale>"` — point user to the official tool
 3. Identify the **target avatar**:
    - Age band (Gen Z 13–24 vs Gen Alpha 9–13 vs Millennial 25–40)
    - Emotional state when scrolling (bored, anxious, validation-seeking, escape-mode, learning-mode)
@@ -119,7 +140,7 @@ NICHE: <niche>   LENGTH: <seconds>   STRUCTURE: <picked structure>   TONE: <tone
 HOOK ARCHETYPE: <archetype>   RETENTION GOAL: <percent>
 
 CAPTION (under video):
-<caption text — 1–2 lines, includes 1–3 hashtags max, asks a question OR plants a curiosity loop>
+<caption text — 1–2 lines, includes 2–4 hashtags (1 niche, 1 broad, 1 geographic if relevant, 1 trend tag if applicable), asks a question OR plants a curiosity loop>
 
 ON-SCREEN TITLE TEXT (first 1.5s overlay):
 <7 words max, ALL CAPS or punchy case, must match the hook>
@@ -203,8 +224,11 @@ Before declaring the script done, run the **20-Point Retention Checklist**. The 
 18. The CTA is implicit, not "like and follow."
 19. The script is achievable with realistic production (no impossible B-roll).
 20. The opening 1.5 seconds is rewatchable on its own (rewatch boosts watch-time multiplier).
+21. The script maps cleanly onto at least one of the **5 viral content patterns** (Delayed Reveal / Controversy Loop / Save-Worthy Tutorial / Relatable Story / Unexpected Comparison) — name which one.
+22. The 3-second gatekeeper passes — ≥ 50–60% of viewers will still be watching at t=3s by design (no slow build, no logo, no preamble).
+23. The 10-second Watch Time Density bar is engineered — first 10s contains zero dead air and at least 4 distinct beats.
 
-For any failed item, rewrite that beat, do not patch with extra explanation. Re-run the checklist until ≥ 18 pass.
+For any failed item, rewrite that beat, do not patch with extra explanation. Re-run the checklist until ≥ 20 pass.
 
 ---
 

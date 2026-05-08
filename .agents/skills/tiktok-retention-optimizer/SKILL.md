@@ -19,13 +19,23 @@ You will be invoked with: `$ARGUMENTS`
 
 If the input is missing or unparseable, ask **one** question and wait. Do not invent a script.
 
+Today's date for trend recency: !`date +%Y-%m-%d`
+
 ---
+
+## TikTok 2026 Algorithm Reality (the bars you're optimizing against)
+
+Retention work in 2026 is graded against three explicit algorithm gates. Every rewrite you make should be justifiable in terms of one or more of these gates:
+
+- **Gate 1 — 3-second gatekeeper**: ≥ 50–60% of viewers still watching at t=3s. Below this, the video never escapes the seed cohort (200–500 viewers). This is the hardest gate.
+- **Gate 2 — 10-second Watch Time Density**: ≥ 60% of viewers still watching at t=10s. Below this, the video never reaches the expanded cohort (5K–50K viewers).
+- **Gate 3 — Completion + Replay**: ≥ ~70% completion rate for sub-60s **and** RR (replay rate) ≥ 1.10. Below this, the video never reaches broad distribution (100K+ viewers).
 
 ## Operating Principle: The Three Numbers That Matter
 
 1. **Average Watch Time / Length (AWTR)** — the percentage of the video the average viewer actually watches. Target ≥ 70% for sub-30s, ≥ 55% for 30–60s, ≥ 40% for 60s+.
-2. **Completion Rate (CR)** — the percentage of viewers who reach the final frame. Target ≥ 35% for sub-30s, ≥ 20% for 60s+.
-3. **Rewatch Rate (RR)** — average views per unique viewer. Target ≥ 1.10 for any video that wants the FYP push.
+2. **Completion Rate (CR)** — the percentage of viewers who reach the final frame. Target ≥ 70% for sub-30s, ≥ 50% for 30–60s, ≥ 35% for 60s+ (2026 bar has risen — was ~50% in 2024).
+3. **Rewatch Rate (RR)** — average views per unique viewer. Target ≥ 1.10 for any video that wants the FYP push. Two consecutive views by the same user is the single strongest signal in the algorithm.
 
 Every rewrite you make must be justifiable in terms of which of these three numbers it raises. If a change does not raise any, it is cosmetic and you skip it.
 
@@ -72,7 +82,7 @@ Diagnostic triggers that automatically raise risk:
 - Any beat with explanation but no advancement of stakes → score ≥ 4.
 - Any "by the way," tangent, or self-introduction → score 5.
 - Any beat that repeats information already given → score ≥ 4.
-- The 3-second mark, the 50% mark, and the 80% mark are **statistical drop cliffs** — flag the beats that span them and treat them as priority rewrite targets.
+- The **3-second gatekeeper**, the **10-second Watch Time Density barrier**, the **50% mark**, and the **80% mark** are **statistical drop cliffs** — flag the beats that span them and treat them as priority rewrite targets. The 3s and 10s bars are non-negotiable algorithm gates.
 
 Output a table:
 
@@ -144,9 +154,9 @@ For untouched beats, mark them `(KEEP — risk 1–2)` and move on. Don't rewrit
 
 ---
 
-## Step 5 — The 25-Point Retention Audit
+## Step 5 — The 30-Point Retention Audit
 
-Before declaring the script optimized, run this audit. Required to ship: **at least 22/25 PASS**.
+Before declaring the script optimized, run this audit. Required to ship: **at least 27/30 PASS**.
 
 1. The hook lands within 1 second.
 2. The hook contains a visual change AND a verbal hook AND on-screen text.
@@ -173,8 +183,13 @@ Before declaring the script optimized, run this audit. Required to ship: **at le
 23. There are no tangents, asides, or self-introductions.
 24. The script could not be cut shorter without losing core meaning.
 25. The script does not exceed the user's target length by more than 5%.
+26. The 3-second gatekeeper passes by design (≥ 55% predicted hold at t=3s).
+27. The 10-second Watch Time Density barrier passes by design (≥ 60% predicted hold at t=10s).
+28. There is a deliberate replay trigger (loop / meaning-flip / counter-twist).
+29. The script maps onto at least one of the **5 viral content patterns** (Delayed Reveal / Controversy Loop / Save-Worthy Tutorial / Relatable Story / Unexpected Comparison).
+30. The DM-share trigger is identifiable ("send this to ___" or identity-statement that begs forwarding to a specific person).
 
-For any FAIL, rewrite that specific beat. Do not generalize.
+For any FAIL, rewrite that specific beat. Do not generalize. Required to ship: **at least 27/30 PASS**.
 
 ---
 
@@ -182,12 +197,14 @@ For any FAIL, rewrite that specific beat. Do not generalize.
 
 If the user gave you specific drop-off timestamps from TikTok analytics, treat them as **commands**:
 
-- **Drop in the first 3 seconds** → the hook is the problem. Generate 3 alternative hooks (use `@skills:tiktok-hook-creator` mental model) and place the strongest one. Common cause: weak first frame, generic first word, slow visual change.
+- **Drop in the first 3 seconds** → the hook is the problem. The 3-second gatekeeper failed; the video is stuck in seed audience (200–500). Generate 3 alternative hooks (use `@skills:tiktok-hook-creator` mental model) and place the strongest one. Common cause: weak first frame, generic first word, slow visual change, fade-in, logo, or default-face hold.
 - **Drop at 5–7s** → the "why stay" promise was weak or arrived late. Move the value-delivery promise earlier and make it concrete.
+- **Drop at 8–10s** → the Watch Time Density gate failed; you're losing the expansion cohort. Add a fresh micro-hook between 6–10s, raise stakes, or accelerate visual cadence.
 - **Drop at the 50% mid-cliff** → no mid-video re-hook, or the stakes plateaued. Add a fresh hook line and an escalation.
 - **Drop in the last 25%** → either the payoff arrived too early (loop closed too soon) or the ending dragged. Either delay the payoff with a false close or trim the ending hard.
 - **High views, low completion, low rewatch** → the content is good but the loop trigger is missing. Add a literal visual loop (last frame = first frame) or a meaning-flip final line.
 - **High completion, low engagement** → there's no save / share / comment trigger. Insert exactly one of each.
+- **Stalled at ~50K views** → the video cleared seed and expansion but the broad-distribution gate (Gate 3) failed. Cause is almost always: weak DM-share trigger, no replay engineering, no save-worthy moment. Add an identity statement ("send this to your sister who…"), an explicit save-bait beat, and a meaning-flip final line for replay.
 
 ---
 

@@ -19,6 +19,22 @@ You will be invoked with: `$ARGUMENTS`
 
 If niche or topic is missing, ask **one** question. Don't trend-wrap blind.
 
+Today's date for trend recency: !`date +%Y-%m-%d`
+
+---
+
+## Authoritative Trend Sources (use these, don't invent)
+
+Before inventing trend names, point the user (or yourself) at the official tools that actually have ground-truth trend data:
+
+- **TikTok Creative Center** — `https://ads.tiktok.com/business/creativecenter` — official trending sounds, hashtags, creators, ads, products, all filterable by region (US, UK, RU, ES, BR, DE, AE, etc.) and category. This is the **only** source you should treat as authoritative for naming a specific trending sound.
+- **TikTok Creator Search Insights** — inside the TikTok app, Profile → Tools — surfaces the actual queries real users are typing in TikTok Search. Best signal for finding **content gap** topics that are searched but underserved.
+- **TikTok in-app "Trending" tabs** — Sounds, Hashtags, Effects — these surface what's hot in the user's logged-in region right now.
+
+Third-party trend trackers (Tokboard, Pentos, Tokchart, etc.) are useful for trend velocity charts but lag the in-app data by hours.
+
+Your skill's role: web-search to identify candidate trends → cross-check via Creative Center → decode the mechanic. Never claim a specific sound title is trending unless the user has verified it in Creative Center.
+
 ---
 
 ## Operating Principle: A Trend Is Not a Sound — It's a Mechanic
@@ -42,14 +58,15 @@ Your job is to pick the **right mechanic for the topic**, not the most popular o
 ## Step 1 — Identify Live Trends
 
 1. Re-read niche, topic, length, locale, trend-type preference.
-2. Use `web_search` for live trend recon. Run at least three searches:
-   - `"TikTok trending sounds {locale} this week 2026"`
+2. Use `web_search` for live trend recon. Today is !`date +%Y-%m-%d`. Run at least three searches using the current week and year:
+   - `"TikTok trending sounds {locale} this week"` (no year — get freshest results)
    - `"TikTok viral format {niche} 2026"`
    - `"TikTok trending transitions 2026"`
+   - `"TikTok Creative Center trending {locale}"` — push the user to the official tool
 3. Cross-check the candidates against the topic. **Reject** any trend whose mechanic does not fit the topic (e.g., a sad-piano sound with a comedy script).
 4. If the user explicitly named a trend, accept it but still cross-check fit. If fit is poor, flag the conflict and propose alternatives.
 
-**Important caveat**: trend recency degrades fast. Note this in the output: "trend signal as of [date] — verify in TikTok Creator Search and the Sounds library at upload time, since lifecycles are 5–14 days."
+**Important caveat**: trend recency degrades fast. Note this in the output: "trend signal as of !`date +%Y-%m-%d` — verify in TikTok Creative Center and the in-app Sounds library at upload time, since lifecycles are 5–14 days for sound trends and 3–7 days for format trends."
 
 ---
 
