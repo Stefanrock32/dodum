@@ -19,6 +19,20 @@ You will be invoked with: `$ARGUMENTS`
 
 If the niche or topic is missing, ask **one** crisp question and wait. Do not produce hooks blind.
 
+Today's date for trend recency: !`date +%Y-%m-%d`
+
+---
+
+## The 2026 Hook Reality
+
+A hook in 2026 has to clear three measurable algorithmic bars, in this order:
+
+1. **0–1s scroll-stop** — the thumb has to freeze. If the first frame is a logo, fade-in, or default-face hold, you've already lost the seed audience.
+2. **3-second gatekeeper** — the algorithm checks 3-second retention as the first health gate. Target: ≥ 50–60% of viewers still watching at t=3s. Below that, the video never escapes the seed cohort of 200–500 users.
+3. **10-second Watch Time Density barrier** — ≥ 60% of viewers still watching at t=10s unlocks expansion to the 5K–50K cohort. The hook needs to do enough work to carry retention to second 10, not just second 3.
+
+A hook that wins second 1 but loses second 3 is a failed hook. A hook that wins second 3 but bleeds before second 10 is a partial hook. A hook that survives all three bars is a viral hook. Engineer for all three.
+
 ---
 
 ## What Counts as a Hook (operating definition)
@@ -150,10 +164,20 @@ Score each hook from 1–10 on every axis:
 
 A hook only ships if it scores **≥ 8 on Stop Power AND ≥ 7 on every other axis.** Anything below = rewrite.
 
+### Predicted-Retention Cross-Check
+
+For every hook, write a one-line **predicted retention curve estimate**:
+- **t=1s hold**: <X%> — your honest model estimate of the % of viewers still watching after 1s
+- **t=3s hold**: <X%> — must be ≥ 55% to ship (the gatekeeper)
+- **t=10s hold**: <X%> — must be ≥ 60% if the video is going to break 100K views
+
+If any of these three estimates falls below the floor, rewrite the hook. The estimate keeps you honest — a hook can score 9/10 on craft but still fail the algorithm if you didn't engineer for the 3s and 10s checkpoints.
+
 ---
 
 ## Step 4 — Rules That Override Everything
 
+- **The first frame must already be in-content.** No black frame, no logo, no fade-in, no slate, no "intro card." Frame 1 is mid-action.
 - **First word matters more than the rest of the sentence.** Strong first words: numbers ("3", "47%"), verbs ("Stop", "Look", "Watch"), shock nouns ("My boss", "$10,000", "Nobody"), curiosity primers ("Why", "How", "If"), identity ("If you're a…").
 - **Banned first words / phrases**: "Hi", "Hey", "What's up", "So…", "Today I want to", "In this video", "Welcome back", "Let me show you", "I just want to say", "Я хочу рассказать", "Привет ребят".
 - **The face must move within the first 0.4s** if a face is on screen. No neutral default face holding for 1+ seconds.
@@ -197,7 +221,10 @@ WHY THIS HOOKS:
 - <one-line why it scores high on Stop Power>
 - <one-line why it triggers a rewatch>
 
-ESTIMATED 3-SECOND HOLD RATE: <X% — your honest model-based estimate>
+ESTIMATED HOLD CURVE:
+  - t=1s: <X%>
+  - t=3s: <X%>   (must be ≥ 55%)
+  - t=10s: <X%>  (must be ≥ 60% for viral break)
 ```
 
 Always deliver **three bundles** so the user can A/B/C test.
@@ -206,7 +233,7 @@ Always deliver **three bundles** so the user can A/B/C test.
 
 ## Step 6 — Hook Stress Test (15-Point Checklist)
 
-Each shipped hook must pass at least **13/15**:
+Each shipped hook must pass at least **15/18**:
 
 1. The first word is a stop-word (number, verb, shock noun, identity, "If you").
 2. There is a visual change within 0.4s.
@@ -223,6 +250,9 @@ Each shipped hook must pass at least **13/15**:
 13. The hook is rewatchable — the viewer would gain something on a second view.
 14. The hook implies stakes (someone could win, lose, learn, be exposed).
 15. The hook does not need a follow / like CTA to make sense.
+16. The predicted t=3s hold is ≥ 55% (passes the algorithm's gatekeeper).
+17. The predicted t=10s hold is ≥ 60% (unlocks the expansion cohort).
+18. The hook maps onto at least one of the **5 viral content patterns** (Delayed Reveal / Controversy Loop / Save-Worthy Tutorial / Relatable Story / Unexpected Comparison).
 
 For any FAIL, rewrite that beat. Do not patch.
 
