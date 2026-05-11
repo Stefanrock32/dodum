@@ -577,5 +577,6 @@ If the niche is not listed, derive a layer in one short paragraph by asking: wha
 - If the user changes scope to **just optimize my draft** → `@skills:tiktok-retention-optimizer`.
 - If the user changes scope to **just script, no production package** → `@skills:tiktok-script-master`.
 - If the user wants **only trend-wrap** of an existing piece → `@skills:tiktok-trend-adapter`.
+- If the user gives you an already-posted video and asks for a **fix / reupload** (not a new shoot) → `@skills:tiktok-video-audit`. That skill enforces audio transcription + ≥ 4 fps frame extraction before any output, which prevents inventing characters or scenes that are not in the source.
 
 This skill is the default for "give me everything I need to film and ship this video." Stay in scope unless the user narrows it.

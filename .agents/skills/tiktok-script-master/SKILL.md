@@ -274,6 +274,7 @@ Deliver to the user, in this order:
 - Do not invent fake stats. Use real numbers, or use phrasing that does not require a stat.
 - Do not include emojis inside on-screen text unless the niche is comedy / Gen Alpha — they reduce perceived authority.
 - Do not write "follow for more" as a CTA. Use implicit CTAs (loops, polarizing lines, save-bait, share-bait).
+- If the user gave you an existing video and asked for a "reupload" or "perezaliv", do **not** silently write a new script in this skill. Reuploads stay in surgery mode — hand off to `@skills:tiktok-video-audit`. Only switch to this skill if the diagnosis is structural and the user accepts the remake label.
 
 ---
 
@@ -283,5 +284,6 @@ If the user only needs a hook → hand off to `@skills:tiktok-hook-creator`.
 If the user has a draft and wants pure retention surgery → hand off to `@skills:tiktok-retention-optimizer`.
 If the user wants the script wrapped around a current trend or sound → hand off to `@skills:tiktok-trend-adapter`.
 If the user wants the **complete production-ready package** (script + shot list + edit instructions + caption + thumbnail + sound brief) → hand off to `@skills:tiktok-full-video-scenario`.
+If the user gave you a posted video and wants a **reupload-fix** (not a new script) → hand off to `@skills:tiktok-video-audit`. That skill enforces ASR + dense-frame ingest before producing any fix, which is the only way to avoid inventing characters or scenes that are not in the source.
 
 This skill, `tiktok-script-master`, is the standalone "give me the best possible script" skill. Stay inside it for that scope.
