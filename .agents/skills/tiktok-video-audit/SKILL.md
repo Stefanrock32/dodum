@@ -132,7 +132,7 @@ Forbidden words inside the choreography map: "probably", "it seems", "must be", 
 ## Step 5 — Diagnose against the three algorithm gates
 
 Use the three gates defined in `tiktok-retention-optimizer`:
-- **Gate 1 (3 s):** ≥ 55–60 % retention at t=3 s
+- **Gate 1 (3 s):** ≥ 50–60 % retention at t=3 s
 - **Gate 2 (10 s):** ≥ 60 % retention at t=10 s
 - **Gate 3 (completion + replay):** ≥ 70 % completion for sub-60s, RR ≥ 1.10
 
