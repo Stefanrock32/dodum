@@ -1,6 +1,6 @@
 ---
 name: tiktok-retention-optimizer
-description: Surgical retention tuning for an existing TikTok script or finished video edit. Use when the user already has a draft (script, storyboard, or edit) and wants the highest possible average watch time, completion rate, and rewatch rate. Performs second-by-second diagnosis, finds drop-off points, and rewrites them with pattern interrupts, micro-loops, peak-end engineering, and pacing fixes.
+description: Surgical retention tuning for an existing TikTok script or finished video edit. Use when the user already has a draft (script, storyboard, or edit) and wants the highest possible average watch time, completion rate, and rewatch rate. Performs second-by-second diagnosis, finds drop-off points, and rewrites them with pattern interrupts, micro-loops, peak-end engineering, and pacing fixes. If the user hands you a posted video file or URL and asks for a reupload-fix, hand off to `@skills:tiktok-video-audit` first to enforce the ASR + dense-frame ingest protocol, then come back here for retention surgery on the resulting beat map.
 argument-hint: <existing-script-or-paste-block> [optional: target-length-seconds | retention-goal-percent | known-drop-off-timestamps]
 triggers: ["user"]
 allowed-tools: Read, Grep, Glob, Write, Edit, MultiEdit, web_search, web_get_contents
@@ -18,6 +18,8 @@ You will be invoked with: `$ARGUMENTS`
   - known drop-off timestamps from TikTok analytics (e.g. "drop at 3s and 11s")
 
 If the input is missing or unparseable, ask **one** question and wait. Do not invent a script.
+
+If the input is a video file or a TikTok URL (not a script), this is the wrong skill — call `@skills:tiktok-video-audit` first so the audit lands on what is actually in the source frames and audio, not on your guess at what is in them.
 
 Today's date for trend recency: !`date +%Y-%m-%d`
 
@@ -234,6 +236,10 @@ Deliver, in this exact order:
 ## Hard Don'ts
 
 - Do not pad to hit length. Cut until every beat earns its slot.
+- Do not optimize a video you have not parsed. If the source is a posted clip, run `@skills:tiktok-video-audit` first — that skill enforces ASR + ≥ 4 fps frame extraction so the beat map reflects the video, not your imagination.
+- Do not invent characters, scenes, or props that are not in the source material. Any character name you write must appear in the user-provided script or be visible in a cited frame.
+- Do not call a scene a "filler" without checking what the voiceover narrates during that scene — in explainer / rules / countdown formats, a static-looking cutaway is usually a *demonstration* of the rule being narrated, and cutting it breaks the story.
+- Do not propose a "reupload" that includes a new shoot, new characters, or a new script. That is a remake — call it a remake.
 - Do not invent stats. If a number is needed and the user didn't give one, use phrasing that doesn't require a stat.
 - Do not move the strongest emotional moment to the start — that's a hook job. Peaks belong at 70–90%.
 - Do not add more than three levers per beat — overengineering kills voice.
