@@ -25,6 +25,7 @@ MODEL_DIRS = {
     "ultralytics_bbox": f"{MODELS_BASE}/ultralytics/bbox",
     "sams": f"{MODELS_BASE}/sams",
     "onnx": f"{MODELS_BASE}/onnx",
+    "wav2lip": f"{MODELS_BASE}/wav2lip",
 }
 
 app = modal.App("comfyui-wan22-venom-master")
@@ -88,11 +89,37 @@ def safe_download(repo: str, filepath: str, out_dir: str, target_name: str,
                 print(f"[FAIL] Failed to download {target_name} after {max_retries} attempts")
 
 
+def download_file(url: str, out_path: str, max_retries: int = 3) -> None:
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    if os.path.exists(out_path) and os.path.getsize(out_path) > 10 * 1024 * 1024:
+        print(f"[SKIP] {os.path.basename(out_path)} already cached")
+        return
+    import requests
+    for attempt in range(max_retries):
+        try:
+            print(f"[DOWNLOAD] {os.path.basename(out_path)} (attempt {attempt + 1}/{max_retries})")
+            response = requests.get(url, stream=True, timeout=300)
+            response.raise_for_status()
+            with open(out_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            print(f"[DONE] {os.path.basename(out_path)}")
+            break
+        except Exception as e:
+            print(f"[ERROR] Attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                wait_time = 5 * (attempt + 1)
+                print(f"[RETRY] Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+            else:
+                print(f"[FAIL] Failed to download {os.path.basename(out_path)} after {max_retries} attempts")
+
+
 comfy_image = (
     modal.Image.debian_slim(python_version='3.11')
     .apt_install(
         "git", "wget", "curl", "ffmpeg", "libgl1", "libglib2.0-0", 
-        "build-essential", "cmake", "python3-dev"
+        "build-essential", "cmake", "python3-dev", "libsndfile1", "pkg-config"
     )
     .pip_install(
         "torch==2.4.1",
@@ -114,6 +141,8 @@ comfy_image = (
         "pygit2",
         "sageattention",
         "gguf",
+        "librosa",
+        "scipy",
     )
     .run_commands(
         "mkdir -p /workspace && "
@@ -128,11 +157,13 @@ comfy_image = (
         "git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git && "
         "git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git && "
         "git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git && "
+        "git clone https://github.com/ShmuelRonen/ComfyUI_wav2lip.git && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-VideoHelperSuite && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-KJNodes && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-WanVideoWrapper && pip install -r requirements.txt || true && "
         "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Inpaint-CropAndStitch && pip install -r requirements.txt || true && "
-        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py"
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI-Impact-Pack && python install.py && "
+        "cd /workspace/ComfyUI/custom_nodes/ComfyUI_wav2lip && pip install -r requirements.txt || true && "
     )
 )
 
@@ -167,6 +198,16 @@ def download_models():
     ]
     for repo, filepath, out_dir, name in DOWNLOADS:
         safe_download(repo, filepath, out_dir, name, token)
+    
+    download_file(
+        'https://github.com/facefusion/facefusion-assets/releases/download/models-3.0.0/wav2lip.pth',
+        os.path.join(MODEL_DIRS['wav2lip'], 'wav2lip.pth')
+    )
+    download_file(
+        'https://github.com/facefusion/facefusion-assets/releases/download/models-3.0.0/face_detection_yolov8n.onnx',
+        os.path.join(MODEL_DIRS['wav2lip'], 'face_detection_yolov8n.onnx')
+    )
+    
     volume.commit()
     print("[DONE] All models downloaded!")
 
@@ -186,6 +227,7 @@ def serve():
     os.environ['TORCH_COMPILE_CACHE_DIR'] = TORCH_CACHE
     for d in list(MODEL_DIRS.values()) + [INPUT_DIR, OUTPUT_DIR, TORCH_CACHE]:
         os.makedirs(d, exist_ok=True)
+    os.makedirs(MODEL_DIRS['wav2lip'], exist_ok=True)
     nodes_py = Path(f'{CUSTOM_NODES_DIR}/ComfyUI-WanVideoWrapper/nodes.py')
     _patch_wanwrapper(nodes_py)
     comfy_models = "/workspace/ComfyUI/models"
@@ -194,6 +236,7 @@ def serve():
         "ultralytics": MODEL_DIRS['ultralytics_bbox'],
         "sams": MODEL_DIRS['sams'],
         "onnx": MODEL_DIRS['onnx'],
+        "wav2lip": MODEL_DIRS['wav2lip'],
     }
     for name, target in symlink_map.items():
         link_path = os.path.join(comfy_models, name)
@@ -204,7 +247,7 @@ def serve():
         os.symlink(target, link_path)
         print(f"[SYMLINK] {link_path} -> {target}")
     zzz_paths_fix = '''"""
-Path fix for detection/sams/ultralytics/onnx models.
+Path fix for detection/sams/ultralytics/onnx/wav2lip models.
 """
 from folder_paths import folder_paths
 NODE_CLASS_MAPPINGS = {}
@@ -214,6 +257,7 @@ for name, path in {
     "sams": "/cache/models/sams",
     "ultralytics": "/cache/models/ultralytics/bbox",
     "onnx": "/cache/models/onnx",
+    "wav2lip": "/cache/models/wav2lip",
 }.items():
     if name not in folder_paths.folder_names:
         folder_paths.folder_names[name] = []
@@ -234,6 +278,7 @@ for name, path in {
   upscalers: upscalers
   embeddings: embeddings
   vae_approx: vae_approx
+  wav2lip: wav2lip
 '''
     yaml_path = "/workspace/ComfyUI/extra_model_paths.yaml"
     Path(yaml_path).write_text(extra_paths_yaml, encoding="utf-8")
